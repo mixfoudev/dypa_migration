@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Έλεγχος αρχείου μετάπτωσης</title>
+    <style>
+        .styled-table {
+          width: 100%;
+          border-collapse: collapse;
+          font-family: Arial, sans-serif;
+          margin-top: 1rem;
+        }
+      
+        .styled-table th, .styled-table td {
+          padding: 12px 16px;
+          text-align: left;
+          border-bottom: 1px solid #ddd;
+        }
+      
+        .styled-table th {
+          background-color: #f4f4f4;
+          font-weight: bold;
+        }
+      
+        .styled-table tbody tr:nth-child(even) {
+          background-color: #f9f9f9;
+        }
+      
+        .styled-table tbody tr:hover {
+          background-color: #f1f1f1;
+        }
+      
+        /* .styled-table td:last-child {
+          text-align: right;
+          font-weight: 500;
+        } */
+      </style>
+</head>
+
+<body>
+    <main style="padding: 20px; width:600px; margin: auto;">
+        <h2>Έλεγχος αρχείου μετάπτωσης (.xlsx)</h2>
+
+        <div>
+            <form method="post" enctype="multipart/form-data">
+                <div style="width: 100%; display: flex;">
+                    <span style="font-weight: bold;margin-inline-end: 10px;">Δομή/Σχολή</span>
+                    <select name="school">
+                        <option value="1">ΕΠΑΣ</option>
+                        <option disabled value="2">ΠΕΠΑΣ</option>
+                        <option disabled value="3">ΣΑΕΚ</option>
+                        <option disabled value="95">ΑΜΕΑ ΑΘΗΝΑΣ</option>
+                        <option disabled value="5">ΑΜΕΑ ΘΕΣΣΑΛΟΝΙΚΗΣ</option>
+                    </select>
+                </div>
+                <div style="width: 100%; display: flex;margin-block: 10px;">
+                    <span style="font-weight: bold;margin-inline-end: 10px;">Αρχείο excel</span>
+                    <input type="file" name="file" title="Επισύναψη" accept=".xlsx">
+                </div>
+                <input type="submit" value="Έλεγχος">
+            </form>
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <ul style="color:red;">
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% endwith %}
+        
+            <!-- {% if missing_columns %}
+            <h3>Στήλες που λείπουν:</h3>
+            <ul>
+                {% for error in missing_columns %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+         -->
+            
+            {% if data.errors %}
+                <h3>Σφάλματα αρχείου:</h3>
+                <ul style="color:red;">
+                    {% for error in data.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            <!-- {% if success %}
+                <h3 style="color:green;">Δεν βρέθηκαν σφάλματα</h3>
+            {% endif %} -->
+
+            {% if data.section_students %}
+                <h2>ΔΕΔΟΜΕΝΑ</h2>
+                <p>Παρατηρήστε τα δεδομένα μήπως υπάρχει κάποιο λογικό λάθος.</p>
+                <h3>Τμήματα: {{section_students|length}}</h3>
+                <table class="styled-table">
+                    <thead>
+                        <th>ΤΜΗΜΑ</th>
+                        <th style="text-align: end;">ΠΛΗΘΟΣ ΜΑΘΗΤΩΝ</th>
+                    </thead>
+                    <tbody>
+                        {% for sec, stud in data.section_students.items() %}
+                        <tr>
+                            <td>{{sec}}</td>
+                            <td style="text-align: end;">{{stud.total}}</td>
+                        </tr>
+                        {% endfor %}
+                    
+                    </tbody>
+                </table>
+            {% endif %}
+
+            {% if data.students %}
+                <h3>Μαθητές: {{data.students.total}}</h3>
+                <table class="styled-table">
+                    <thead>
+                        <th>ΑΦΜ</th>
+                        <th>ΕΠΩΝΥΜΟ</th>
+                        <th>ΟΝΟΜΑ</th>
+                    </thead>
+                    <tbody>
+                        {% for s in data.students.data %}
+                        <tr>
+                            <td>{{s.vat}}</td>
+                            <td>{{s.lastname}}</td>
+                            <td>{{s.name}}</td>
+                        </tr>
+                        {% endfor %}
+                    
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+    </main>
+
+
+   
+</body>
+
+</html>
