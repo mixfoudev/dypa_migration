@@ -211,7 +211,7 @@ def validate_excel(file_path):
 
     for rk in row_errors.keys():
         if len(row_errors[rk]) == 0 : continue
-        errors.append(f"Σειρά: {rk} - Μη έγκυρες τιμές: {", ".join(row_errors[rk])}")
+        errors.append(f"Σειρά: {rk} - Μη έγκυρες τιμές: {', '.join(row_errors[rk])}")
     
     students['data'] = sorted(students["data"], key=lambda x: x['lastname'])
     data = {"errors": errors,"section_students": section_students,"students": students if len(students['data']) > 0 else None}
