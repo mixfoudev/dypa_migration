@@ -62,7 +62,7 @@ def upload_file():
             #data = validate.validate_school(school, filepath)
             try:
                 #error_rows, section_students, students = validate.validate_school(school, filepath)
-                data = validate.validate_school(school, filepath)
+                data = validate.validate_school(int(school), filepath)
                 print("erors: ",len(data['errors']))
             except Exception as e:
                 print(f"Αδυναμία ανάγνωσης αρχείου: {e}")
@@ -127,4 +127,4 @@ def upload_file():
 
 if __name__ == "__main__":
     #app.run(debug=True)
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=3001, debug=True)
