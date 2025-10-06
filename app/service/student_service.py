@@ -65,6 +65,7 @@ def createPersonal(dto,cursor=None):
     return q.insert_personal(values,cursor)
 
 def createStudentFields(dto, userId, contactId, personalId, dypaId, eduSpecId, eduId, uuid,cursor=None):
+    print("creating student fields for dypaID: ", dypaId)
     if dypaId in (1,2):
         return createStudentEpasFields(dto, userId, contactId, personalId, dypaId, uuid,cursor)
     elif dypaId == 3:

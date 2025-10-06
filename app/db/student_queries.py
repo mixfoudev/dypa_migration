@@ -204,6 +204,7 @@ def insert_epas_registration(values, dypaId, cursor=None):
             now(), now(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
             )
         """ 
+        #print("sql:", sql)
     if cursor:
         cursor.execute(sql, (values))
         new_id = cursor.lastrowid

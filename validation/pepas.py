@@ -15,7 +15,7 @@ COLUMNS = [
     ,"ΒΑΘΜΟΣ ΠΡΟΗΓ. ΤΑΞΗΣ","ΑΡΙΘ. ΦΟΙΤΗΣΕΩΝ"
 ]
 
-dypaId = 1
+dypaId = 2
 
 def calc_period(tp):
     if not tp: return None
@@ -137,6 +137,8 @@ def validate_field(row, field_name, value, err):
     return True
 
 def update_row_data_info(row, students,section_students, err):
+    print("erreeeeeeeeeeeeeeeeeee",err)
+    print("dypaId",dypaId)
     for s in ['ΑΦΜ', 'ΟΝΟΜΑ', 'ΕΠΩΝΥΜΟ', 'ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ', 'ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ']:
         if s in err: return
     vat = row['ΑΦΜ']
@@ -152,7 +154,7 @@ def update_row_data_info(row, students,section_students, err):
 def eduSpecMissing(row, err):
     for s in ['ΕΙΔΙΚΟΤΗΤΑ', 'ΣΧΟΛΗ', 'ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ']: 
         if s in err: True
-    eduSpecId = staticService.get_edu_year_spec(row['ΣΧΟΛΗ'], row['ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ'], row['ΕΙΔΙΚΟΤΗΤΑ'])
+    eduSpecId = staticService.get_edu_year_spec(row['ΣΧΟΛΗ'].strip(), row['ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ'], row['ΕΙΔΙΚΟΤΗΤΑ'].strip())
     return eduSpecId is None
 
 def validate_excel(file_path):
@@ -189,7 +191,7 @@ def validate_excel(file_path):
             if not validate_field(row ,field, val, err):
                 err.append(field)
                 row_errors[key].append(field)    
-        
+            #print(f"{field}: {row[field]}")
         update_row_data_info(row, students, section_students, err)
         if "ΑΦΜ" not in err:
             vat = row['ΑΦΜ']
@@ -220,6 +222,7 @@ def validate_excel(file_path):
     acYears = check_academic_years(df)
     data['ac_years'] = sorted(acYears, key=lambda x: x['name'])
     data['existing_students'] = existing_students
+    print("data", data)
     return data
 
 # if __name__ == "__main__":

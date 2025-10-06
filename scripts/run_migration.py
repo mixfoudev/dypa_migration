@@ -58,7 +58,7 @@ with app.app_context():
         print("✅ Everything seems OK.")
         print("Running migration")
         if input("continue to migration ? (y/n): ") == 'y':
-             migrate.migrate_school(1, file_path)
+             migrate.migrate_school(dypaType, file_path)
     else:
         exist_students = data['existing_students'] if 'existing_students' in data.keys() else None
         if errors: print("❌ Errors found:")

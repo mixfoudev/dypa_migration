@@ -1,7 +1,7 @@
 import pandas as pd
 import re
 from app.service import static_data_service as staticService
-from app.service import epas_service
+from app.service import pepas_service
 
 # expected columns
 COLUMNS = [
@@ -202,5 +202,5 @@ def migrate_excel(file_path):
         user = user_from_row(row)
         dtos.append(dto)
         print("saving row")
-        epas_service.save(user, contact, personal, student, classStud)
+        pepas_service.save(user, contact, personal, student, classStud)
     

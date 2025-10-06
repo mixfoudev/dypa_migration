@@ -9,7 +9,7 @@ def save2(user, contact, personal, student, classStud):
     eduSpecId = staticService.get_edu_year_spec(student.get('edu'), classStud.get('acYear'), classStud.get('spec'))
 
     if not eduId or not eduSpecId:
-        print(f"epas save: can not find eduId : {eduId} or eduSpecId: {eduSpecId}. Aborting")
+        print(f"pepas save: can not find eduId : {eduId} or eduSpecId: {eduSpecId}. Aborting")
 
     userId = s.getOrInsertUser(user)
     contactId = s.createContact(contact)
@@ -23,7 +23,7 @@ def save2(user, contact, personal, student, classStud):
 
 def save(user, contact, personal, student, classStud):
     db = current_app.config['DB']
-    dypaId = 1
+    dypaId = 2
     try:
         eduId = staticService.get_edu_id(student.get('edu'))
         eduSpec = staticService.get_edu_year_spec(student.get('edu'), classStud.get('acYear'), classStud.get('spec'))

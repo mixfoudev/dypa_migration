@@ -59,6 +59,8 @@ def edu_exists(dypaId, name):
         hash_edu[dypaId] = dypaSchools
         for e in dypaSchools:
             edu_ids[e['name']]=e['id']
+    #print("aaaa hashedu:", hash_edu)
+    #print(f"name: '{name}'")
     return name in [s['name'] for s in hash_edu[dypaId]]
 
 def get_countries():
