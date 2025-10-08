@@ -1,4 +1,4 @@
-from . import epas, pepas
+from . import epas, pepas, amea_ath
 
 def validate_school(id, filepath):
     print("validate_school id:", id, "filepath: ", filepath)
@@ -22,6 +22,6 @@ def validate_school(id, filepath):
         return errors
     elif id == 95:
         print("validating amea ath")
-        #errors = epas.validate_excel(filepath)
+        errors = amea_ath.validate_excel(filepath)
         return errors
     return []

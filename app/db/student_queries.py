@@ -1,5 +1,10 @@
 from flask import current_app
 
+# def log_session(cursor, where):
+#     cursor.execute("SELECT CONNECTION_ID() AS cid, @@autocommit AS ac")
+#     row = cursor.fetchone()           # e.g., {'cid': 12345, 'ac': 0}
+#     print(f"[{where}] conn_id={row['cid']}, autocommit={row['ac']}")
+
 def get_user_by_vat(vat):
     db = current_app.config['DB']
     with db.cursor() as cursor:
@@ -28,6 +33,30 @@ def insert_user(values, cursor=None):
         print("❌ DB User insert error:", e)
         return False
     
+def insert_health(values, cursor=None):
+    sql = """INSERT INTO health_info (
+        created_at, updated_at, kepa_certificate_id
+        )
+        VALUES (now(), now(), %s)
+        """
+    print("Creating health_info with values: ",values)
+    if cursor: 
+        cursor.execute(sql, (values))
+        new_id = cursor.lastrowid
+        return new_id
+    
+    db = current_app.config['DB']
+    try:
+        with db.cursor() as cursor:
+            cursor.execute(sql, (values))
+            new_id = cursor.lastrowid
+        db.commit()
+        return new_id
+    except Exception as e:
+        db.rollback()
+        print("❌ DB health_info insert error:", e)
+        return False
+    
 def insert_contact(values, cursor=None):
     sql = """INSERT INTO contact_details (
         created_at, updated_at, address, address_number, area, city, email,
@@ -36,11 +65,12 @@ def insert_contact(values, cursor=None):
         VALUES (now(), now(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
     print("Creating contact details with values: ",values)
-    if cursor:        
+    if cursor:
+        print("cursor exists")  
         cursor.execute(sql, (values))
         new_id = cursor.lastrowid
         return new_id
-    
+    print("cursor not exist. creating...")
     db = current_app.config['DB']
     try:
         with db.cursor() as cursor:
@@ -256,11 +286,11 @@ def insert_amea_registration(values, cursor=None):
             edu_id, edu_spec_id, eval_result, eval_status, status, uuid,
             contact_details_id, guardian_id, health_info_id, invitation_id,
             personal_info_id, social_id, register_education_id, user_id,
-            guardian_file_id, edu_spec2_id
+            guardian_file_id, edu_spec2_id, reg_type
             )
             VALUES (
             now(), now(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-            %s, %s, %s, %s, %s
+            %s, %s, %s, %s, %s, %s
             )
             """
     if cursor:

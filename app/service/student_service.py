@@ -24,6 +24,16 @@ def getOrInsertUser(dto,cursor=None):
     values.append(dto.get('vat'))
     return q.insert_user(values,cursor)
 
+def createHealth(dto,cursor=None):
+    values = []
+    kepa = dto.get('kepa')
+    hid = 1
+    if kepa == 'ΛΟΙΠΕΣ ΟΡΓΑΝΙΚΕΣ ΠΑΘΗΣΕΙΣ': hid = 2
+    elif kepa == 'ΨΥΧΙΚΕΣ ΠΑΘΗΣΕΙΣ': hid = 3
+    elif kepa == 'ΚΙΝΗΤΙΚΗ ΑΝΑΠΗΡΙΑ 50%+': hid = 4
+    values.append(hid)
+    return q.insert_health(values,cursor)
+
 def createContact(dto,cursor=None):
     values = []
     values.append(dto.get('address'))
@@ -64,23 +74,23 @@ def createPersonal(dto,cursor=None):
     values.append(0) # updated_by_user
     return q.insert_personal(values,cursor)
 
-def createStudentFields(dto, userId, contactId, personalId, dypaId, eduSpecId, eduId, uuid,cursor=None):
+def createStudentFields(dto, userId, healthId, contactId, personalId, dypaId, eduSpecId, eduId, uuid,cursor=None):
     print("creating student fields for dypaID: ", dypaId)
     if dypaId in (1,2):
         return createStudentEpasFields(dto, userId, contactId, personalId, dypaId, uuid,cursor)
     elif dypaId == 3:
         return createStudentSaekFields(dto, userId, contactId, personalId, uuid,cursor)
-    elif dypaId == 5:
-        return createStudentAmeaFields(dto, userId, contactId, eduSpecId, eduId, personalId, uuid,cursor)
+    elif dypaId in [33,95]:
+        dypaId = 5
+        return createStudentAmeaFields(dto, userId, healthId, contactId, eduSpecId, eduId, personalId, uuid,cursor)
     else:
-        return None
+        raise RuntimeError("[StudentService.createStudentFields] invalid dypaId") 
 
 def createStudent(dto, userId, contactId, eduSpecId, eduId, personalId, dypaId, fieldsId, uuid, srUuid, cursor=None):
     regDate = u.get_date(dto.get('dateRegister'))
     acYearId = staticService.get_acYear_id(dto.get('acYearRegister'))
-    skipLessons = dto.get('noSkipLessons') == 'ΟΧΙ'
-    #print("acYearId", acYearId)
-    #print("skipLessons", skipLessons)
+    if dypaId in [33,95]: dypaId = 5
+    
     values = []
     values.append(acYearId) # acYearId
     values.append(dto.get('am'))
@@ -93,14 +103,14 @@ def createStudent(dto, userId, contactId, eduSpecId, eduId, personalId, dypaId, 
     values.append(dto.get('eval_uuid'))
     values.append(0) # exception
     values.append(dto.get('ext_transfer_from'))
-    values.append(fieldsId) ### todo fields_id
+    values.append(fieldsId) ### fields_id
     values.append(personalId)
     values.append(1) # is_active
     values.append(dto.get('kpa'))
     values.append(dto.get('practice_info_id'))
-    values.append(skipLessons) #skipGeneralLessons
+    values.append(None) #skipGeneralLessons
     values.append(dto.get('social_id'))
-    values.append(srUuid) ## srUuid todo
+    values.append(srUuid) ## srUuid
     values.append('ACTIVE') #status
     values.append(0) #transferred
     values.append('MIGRATION') # type
@@ -136,18 +146,23 @@ def createClassStudent(dto, studentId, acId, sectionId, teachPeriodId,cursor=Non
     values.append(0) # is_partial
     values.append(0) # classes_after
     values.append(dto.get('after_class_num'))
-    values.append(0) # abs
-    values.append(0) # just_abs
+    # add also mig abs as initial abs
+    values.append(dto.get('abs') if dto.get('abs') else 0) # abs
+    values.append(dto.get('justAbs') if dto.get('justAbs') else 0) # just_abs
+    # values.append(0) # abs
+    # values.append(0) # just_abs
     values.append(1) # version
     values.append(dto.get('avg_grade'))
     values.append(1) # is_current
-    values.append(0) # mig_abs
-    values.append(0) # mig_just_abs
+    values.append(dto.get('abs') if dto.get('abs') else 0) # mig_abs
+    values.append(dto.get('justAbs') if dto.get('justAbs') else 0) # mig_just_abs
+    #values.append(0) # mig_just_abs
     values.append(dto.get('grade')) # mig_avg_grade
-    values.append(dto.get('studyNum')) # mig_study_times
+    values.append(None) # mig_study_times
     return q.insert_class_student_student(values,cursor)
 
 def createClassStudentLessons(classLessons, studentId, classStudentId, periodNum, dypaId,cursor=None):
+    if dypaId in [33,95]: dypaId = 5
     values = [
                 (
                     1, # l.get('abs_passed'),
@@ -232,7 +247,8 @@ def createStudentSaekFields(dto, userId, contactId, personalId, uuid,cursor=None
     values.append('MIGRATION') # reg_type
     return q.insert_saek_registration(values, cursor)
 
-def createStudentAmeaFields(dto, userId, contactId, eduSpecId, eduId, personalId, uuid,cursor=None):
+def createStudentAmeaFields(dto, userId, healthId, contactId, eduSpecId, eduId, personalId, uuid,cursor=None):
+    print("createStudentAmeaFields")
     values = []
     values.append(staticService.get_acYear_id(dto.get('acYearRegister'))) # academic_year_id
     values.append(dto.get('date_submitted'))
@@ -245,7 +261,7 @@ def createStudentAmeaFields(dto, userId, contactId, eduSpecId, eduId, personalId
     values.append(uuid) ## uuid
     values.append(contactId) # contact_details_id
     values.append(dto.get('guardian_id'))
-    values.append(dto.get('health_info_id')) ## todo - edw kati tha thelw mallon
+    values.append(healthId) ## todo - edw kati tha thelw mallon
     values.append(dto.get('invitation_id'))
     values.append(personalId) # personal_info_id
     values.append(dto.get('social_id'))
@@ -253,4 +269,5 @@ def createStudentAmeaFields(dto, userId, contactId, eduSpecId, eduId, personalId
     values.append(userId) # user_id
     values.append(dto.get('guardian_file_id'))
     values.append(dto.get('edu_spec2_id'))
+    values.append('MIGRATION') # reg_type
     return q.insert_amea_registration(values, cursor)

@@ -1,4 +1,4 @@
-from . import epas, pepas
+from . import epas, pepas, amea_ath
 
 def migrate_school(id, filepath):
     print("migrate_school id:", id, "filepath: ", filepath)
@@ -21,6 +21,6 @@ def migrate_school(id, filepath):
         return errors
     elif id == 95:
         print("migrating amea ath")
-        #epas.migrate_excel(filepath)
+        amea_ath.migrate_excel(filepath)
         return errors
     return []
