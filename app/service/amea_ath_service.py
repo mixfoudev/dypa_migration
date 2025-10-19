@@ -9,7 +9,7 @@ def save2(user, contact, personal, student, classStud):
     eduSpecId = staticService.get_edu_year_spec(student.get('edu'), classStud.get('acYear'), classStud.get('spec'))
 
     if not eduId or not eduSpecId:
-        print(f"epas save: can not find eduId : {eduId} or eduSpecId: {eduSpecId}. Aborting")
+        print(f"amea ath save: can not find eduId : {eduId} or eduSpecId: {eduSpecId}. Aborting")
 
     userId = s.getOrInsertUser(user)
     contactId = s.createContact(contact)
@@ -40,7 +40,7 @@ def save(user, contact, personal, student, classStud):
         #print("periodNum", periodNum)
 
         if not eduId or not eduSpec or not classId:
-            print(f"epas save: can not find eduId : {eduId} or eduSpec: {eduSpec} or classid: {classId} . Aborting")
+            print(f"amea ath save: can not find eduId : {eduId} or eduSpec: {eduSpec} or classid: {classId} . Aborting")
             return False
         
         eduSpecId = eduSpec['id']

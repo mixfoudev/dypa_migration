@@ -10,6 +10,7 @@ edu_year_specs = {}
 edu_ids = {}
 spec_ids = {}
 class_lessons = {}
+class_lessonsEpas = {}
 
 def student_exists_by_vat(vat):
     c = len(q.active_student_exists_by_vat(vat))
@@ -46,6 +47,12 @@ def get_class_lessons(classId):
         lessons = q.get_class_lessons(classId)
         class_lessons[classId] = lessons
     return class_lessons[classId]
+
+def get_class_lessonsEpas(classId):
+    if not classId in class_lessonsEpas.keys():
+        lessons = q.get_class_lessonsWithEpasLessonType(classId)
+        class_lessonsEpas[classId] = lessons
+    return class_lessonsEpas[classId]
 
 def class_section_exists(dypaId, name, acName):
     if not dypaId in hash_sections.keys():

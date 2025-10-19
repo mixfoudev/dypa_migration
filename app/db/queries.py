@@ -59,7 +59,14 @@ def get_class_lessons(cId):
     db = current_app.config['DB']
     with db.cursor() as cursor:
         cursor.execute(f"SELECT * from class_lessons where class_id = {cId}")
+        return cursor.fetchall()    
+    
+def get_class_lessonsWithEpasLessonType(cId):
+    db = current_app.config['DB']
+    with db.cursor() as cursor:
+        cursor.execute(f"SELECT cl.*, l.epas_lesson_type from class_lessons cl inner join aa_lessons l on l.id =cl.lesson_id where cl.class_id = {cId} ")
         return cursor.fetchall()
+    
     
 def get_countries():
     db = current_app.config['DB']

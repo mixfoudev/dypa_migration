@@ -18,7 +18,7 @@ def save2(user, contact, personal, student, classStud):
     print("contact id: ", contactId)
     print("personal id: ", personalId)
     srUuid = str(uuid.uuid4())
-    fieldsId = s.createStudentFields(student, userId, contactId, personalId, 1, eduSpecId, eduId, srUuid)
+    fieldsId = s.createStudentFields(student, userId, None, contactId, personalId, 1, eduSpecId, eduId, srUuid)
     print("fieldsId : ", fieldsId)
 
 def save(user, contact, personal, student, classStud):
@@ -36,7 +36,7 @@ def save(user, contact, personal, student, classStud):
         #print("periodNum", periodNum)
 
         if not eduId or not eduSpec or not classId:
-            print(f"epas save: can not find eduId : {eduId} or eduSpec: {eduSpec} or classid: {classId} . Aborting")
+            print(f"pepas save: can not find eduId : {eduId} or eduSpec: {eduSpec} or classid: {classId} . Aborting")
             return False
         
         eduSpecId = eduSpec['id']
@@ -48,14 +48,16 @@ def save(user, contact, personal, student, classStud):
             personalId = s.createPersonal(personal, cursor)
             print("personal id: ", personalId)
             srUuid = str(uuid.uuid4())
-            fieldsId = s.createStudentFields(student, userId, contactId, personalId, dypaId, eduSpecId, eduId, srUuid, cursor)
+            fieldsId = s.createStudentFields(student, userId, None, contactId, personalId, dypaId, eduSpecId, eduId, srUuid, cursor)
             print("fieldsId : ", fieldsId)
             stUuid = str(uuid.uuid4())
             studentId = s.createStudent(student, userId, contactId, eduSpecId, eduId, personalId, dypaId, fieldsId, stUuid, srUuid, cursor)
             print("studentId : ", studentId)
             classStudId = s.createClassStudent(classStud, studentId, inputAcYearId, classId, teachPeriodId ,cursor)
             print("classStudId : ", classStudId)
-            classLessons = staticService.get_class_lessons(classId)
+            classLessons = staticService.get_class_lessonsEpas(classId)
+            if student.get('attendGeneralLesson') == 'ΟΧΙ':
+                classLessons = [l for l in classLessons if l['epas_lesson_type'] != 'GENERAL']
             s.createClassStudentLessons(classLessons, studentId, classStudId, periodNum, dypaId, cursor)
         db.commit()
         return True

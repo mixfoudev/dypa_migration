@@ -17,7 +17,7 @@ def get_dypa_type_from_file_name(file):
     if 'pepas' in file: return 2
     if 'epas' in file: return 1
     if 'amea_ath' in file: return 95
-    if 'amea_thess' in file: return 33
+    if 'amea_thes' in file: return 33
     return None
 
 with app.app_context():
@@ -32,7 +32,7 @@ with app.app_context():
 
     dypaType = get_dypa_type_from_file_name(args.file)
     if not dypaType :
-        print("Could not get dypa type from file name")
+        print("Could not get dypa type from file name:", args.file)
         exit()
     
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))

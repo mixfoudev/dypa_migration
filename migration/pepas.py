@@ -67,7 +67,7 @@ def personal_from_row(row):
 def student_from_row(row):
     d ={}
     d['kpa'] = row['ΚΠΑ'].strip()
-    d['noSkipLessons'] = row['ΠΑΡΑΚΟΛΟΥΘΕΙ ΜΑΘΗΜΑΤΑ ΓΕΝ ΠΑΙΔΕΙΑΣ'].strip()
+    d['attendGeneralLesson'] = row['ΠΑΡΑΚΟΛΟΥΘΕΙ ΜΑΘΗΜΑΤΑ ΓΕΝ ΠΑΙΔΕΙΑΣ'].strip()
     d['am'] = row['ΑΜ'].strip()
     d['dateRegister'] = row['ΗΜΝΙΑ ΕΓΓΡΑΦΗΣ'].strip()
     d['acYearRegister'] = row['ΑΚΑΔ. ΕΤΟΣ ΕΓΓΡΑΦΗΣ'].strip()
@@ -107,7 +107,7 @@ def row_to_dto(row):
     d['maleRegId'] = row['ΑΜ ΑΡΡΕΝΩΝ'].strip()
     d['makeRegPlace'] = row['ΤΟΠ ΕΓΓ Μ.Α'].strip()
     d['kpa'] = row['ΚΠΑ'].strip()
-    d['noSkipLessons'] = row['ΠΑΡΑΚΟΛΟΥΘΕΙ ΜΑΘΗΜΑΤΑ ΓΕΝ ΠΑΙΔΕΙΑΣ'].strip()
+    d['attendGeneralLesson'] = row['ΠΑΡΑΚΟΛΟΥΘΕΙ ΜΑΘΗΜΑΤΑ ΓΕΝ ΠΑΙΔΕΙΑΣ'].strip()
     d['am'] = row['ΑΜ'].strip()
     d['dateRegister'] = row['ΗΜΝΙΑ ΕΓΓΡΑΦΗΣ'].strip()
     d['acYearRegister'] = row['ΑΚΑΔ. ΕΤΟΣ ΕΓΓΡΑΦΗΣ'].strip()

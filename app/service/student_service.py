@@ -84,12 +84,25 @@ def createStudentFields(dto, userId, healthId, contactId, personalId, dypaId, ed
         dypaId = 5
         return createStudentAmeaFields(dto, userId, healthId, contactId, eduSpecId, eduId, personalId, uuid,cursor)
     else:
-        raise RuntimeError("[StudentService.createStudentFields] invalid dypaId") 
+        raise RuntimeError("[StudentService.createStudentFields] invalid dypaId: ", dypaId) 
 
 def createStudent(dto, userId, contactId, eduSpecId, eduId, personalId, dypaId, fieldsId, uuid, srUuid, cursor=None):
     regDate = u.get_date(dto.get('dateRegister'))
     acYearId = staticService.get_acYear_id(dto.get('acYearRegister'))
     if dypaId in [33,95]: dypaId = 5
+
+    skipGeneralLessons = 0
+    if dypaId in [1,2] and dto.get('attendGeneralLesson') == 'ΟΧΙ': skipGeneralLessons = 1
+
+    status = 'ACTIVE'
+    kepeStatus=None
+    gradDate=None
+    if 'kepe' in dto.keys() and dto.get('kepe') == 'ΝΑΙ':
+        status = None
+        kepeStatus= 'ACTIVE'
+        gradDate =  u.get_date(dto.get('gradDate'))
+        # kepeDateReg = u.get_date(dto.get('dateRegister'))
+        # regDate = None
     
     values = []
     values.append(acYearId) # acYearId
@@ -108,10 +121,10 @@ def createStudent(dto, userId, contactId, eduSpecId, eduId, personalId, dypaId, 
     values.append(1) # is_active
     values.append(dto.get('kpa'))
     values.append(dto.get('practice_info_id'))
-    values.append(None) #skipGeneralLessons
+    values.append(skipGeneralLessons) #skipGeneralLessons
     values.append(dto.get('social_id'))
     values.append(srUuid) ## srUuid
-    values.append('ACTIVE') #status
+    values.append(status) #status
     values.append(0) #transferred
     values.append('MIGRATION') # type
     values.append(uuid) ## uuid
@@ -123,8 +136,8 @@ def createStudent(dto, userId, contactId, eduSpecId, eduId, personalId, dypaId, 
     values.append(dto.get('submitter_id'))
     values.append(userId) # user_id
     values.append(dto.get('group_id')) ## todo update the same instance ??
-    values.append(dto.get('kepe_status'))
-    values.append(dto.get('graduation_date'))
+    values.append(kepeStatus)# kepeStatus
+    values.append(gradDate) # graduation_date
     values.append(dto.get('graduation_kepe_date'))
     values.append(dto.get('guardian_id'))
     values.append(dto.get('remove_date'))
