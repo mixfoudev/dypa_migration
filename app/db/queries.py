@@ -6,6 +6,12 @@ def get_users():
         cursor.execute("SELECT * FROM users")
         return cursor.fetchall()
     
+def get_ams_for_edu(eduId):
+    db = current_app.config['DB']
+    with db.cursor() as cursor:
+            cursor.execute(f"SELECT distinct am FROM students where edu_unit_id={eduId}")
+            return cursor.fetchall()
+    
 def get_schools(dypaId):
     db = current_app.config['DB']
     print("DB. fetching schools for dypa: ", dypaId)

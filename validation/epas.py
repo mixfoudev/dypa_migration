@@ -172,6 +172,7 @@ def validate_excel(file_path):
     errors = []
     unique_vats = []
     unique_adts = []
+    unique_ams = {}
     students = {"total": 0, "data": []}
     section_students = {}
     row_errors={}
@@ -198,6 +199,16 @@ def validate_excel(file_path):
                 if staticService.student_exists_by_vat(vat):
                     existing_students.append(vat)
             else: row_errors[key].append("Διπλότυπος ΑΦΜ")
+        if "ΑΜ" not in err and 'ΣΧΟΛΗ' not in err:
+            am = row['ΑΜ']
+            sxoli = row['ΣΧΟΛΗ']
+            if not sxoli in unique_ams.keys(): unique_ams[sxoli] = []
+            if am not in unique_ams[sxoli]:
+                unique_ams[sxoli].append(am)
+            else: row_errors[key].append("Διπλότυπος ΑΜ για την σχολή " + sxoli)
+            #
+            if am in staticService.get_edu_ams(dypaId, sxoli):
+                row_errors[key].append("Ο ΑΜ υπάρχει στο σύστημα για την σχολή " + sxoli)
         if "ΑΔΤ" not in err:
             adt = row['ΑΔΤ']
             if adt not in unique_adts:

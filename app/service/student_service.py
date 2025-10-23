@@ -98,7 +98,7 @@ def createStudent(dto, userId, contactId, eduSpecId, eduId, personalId, dypaId, 
     kepeStatus=None
     gradDate=None
     if 'kepe' in dto.keys() and dto.get('kepe') == 'ΝΑΙ':
-        status = None
+        status = 'GRADUATED'
         kepeStatus= 'ACTIVE'
         gradDate =  u.get_date(dto.get('gradDate'))
         # kepeDateReg = u.get_date(dto.get('dateRegister'))

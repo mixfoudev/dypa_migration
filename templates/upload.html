@@ -53,7 +53,7 @@
                             <option value="2">ΠΕΠΑΣ</option>
                             <option disabled value="3">ΣΑΕΚ</option>
                             <option value="95">ΑΜΕΑ ΑΘΗΝΑΣ</option>
-                            <option disabled value="33">ΑΜΕΑ ΘΕΣΣΑΛΟΝΙΚΗΣ</option>
+                            <option value="33">ΑΜΕΑ ΘΕΣΣΑΛΟΝΙΚΗΣ</option>
                         </select>
                     </div>
                     <div style="margin-block: 10px;">
@@ -109,6 +109,23 @@
                 </tbody>
             </table>
             {% endif %}
+
+           <!--  {% if data.existing_ams %}
+            <h3 style="color:red;">ΑΜ που έχουν ήδη δηλωθεί στο σύστημα: {{data.existing_ams|length}}</h3>
+            <table class="styled-table">
+                <thead>
+                    <th style="background-color: red; color: whitesmoke;">ΑΦΜ</th>
+                </thead>
+                <tbody>
+                    {% for s in data.existing_ams %}
+                    <tr>
+                        <td>{{s}}</td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+            {% endif %} -->
 
 
             {% if data.section_students %}

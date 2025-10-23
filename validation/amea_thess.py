@@ -115,7 +115,7 @@ def validate_field(row, field_name, value, err):
         
     elif field_name == 'ΗΜΝΙΑ ΑΠΟΦΟΙΤΗΣΗΣ':
         try:
-            return pd.isna(value) or validate_ac_year(value)
+            return pd.isna(value) or is_valid_date(value)
         except Exception as e:
             return False
 
@@ -173,6 +173,7 @@ def validate_excel(file_path):
     errors = []
     unique_vats = []
     unique_adts = []
+    unique_ams = {}
     students = {"total": 0, "data": []}
     section_students = {}
     row_errors={}
@@ -204,6 +205,17 @@ def validate_excel(file_path):
             if adt not in unique_adts:
                 unique_adts.append(adt)
             else: row_errors[key].append("Διπλότυπο ΑΔΤ")
+        if "ΑΜ" not in err and 'ΣΧΟΛΗ' not in err:
+            am = row['ΑΜ']
+            sxoli = row['ΣΧΟΛΗ']
+            if not sxoli in unique_ams.keys(): unique_ams[sxoli] = []
+            if am not in unique_ams[sxoli]:
+                unique_ams[sxoli].append(am)
+            else: row_errors[key].append("Διπλότυπος ΑΜ για την σχολή " + sxoli)
+            #
+            if am in staticService.get_edu_ams(dypaId, sxoli):
+                row_errors[key].append("Ο ΑΜ υπάρχει στο σύστημα για την σχολή " + sxoli)
+        
         if (eduSpecMissing(row, err)):
             row_errors[key].append("ΕΙΔΙΚΟΤΗΤΑ ΑΝΑ ΕΤΟΣ")
 

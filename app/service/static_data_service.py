@@ -8,6 +8,7 @@ ac_years = []
 countries = []
 edu_year_specs = {}
 edu_ids = {}
+edu_ams = {}
 spec_ids = {}
 class_lessons = {}
 class_lessonsEpas = {}
@@ -66,9 +67,17 @@ def edu_exists(dypaId, name):
         hash_edu[dypaId] = dypaSchools
         for e in dypaSchools:
             edu_ids[e['name']]=e['id']
+            amRes = q.get_ams_for_edu(e['id'])
+            edu_ams[e['id']] = [s[0] for s in amRes]
     #print("aaaa hashedu:", hash_edu)
     #print(f"name: '{name}'")
     return name in [s['name'] for s in hash_edu[dypaId]]
+
+def get_edu_ams(dypaId, name):
+    if not edu_exists(dypaId, name): return []
+    out = edu_ams[edu_ids[name]]
+    #print("get_edu_ams: ", out)
+    return out
 
 def get_countries():
     global countries

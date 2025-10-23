@@ -1,5 +1,5 @@
 import pandas as pd
-from app.service import amea_ath_service
+from app.service import amea_thes_service
 
 # expected columns
 COLUMNS = [
@@ -67,7 +67,7 @@ def student_from_row(row):
     d['spec'] = row['ΕΙΔΙΚΟΤΗΤΑ'].strip()
     d['kepa'] = row['ΠΑΘΗΣΗ ΚΕΠΑ'].strip()
     d['kepe'] = row['ΚΕΠΕ'].strip()
-    d['gradDate'] = row['ΗΜΝΙΑ ΑΠΟΦΟΙΤΗΣΗΣ'].strip()
+    d['gradDate'] = row['ΗΜΝΙΑ ΑΠΟΦΟΙΤΗΣΗΣ']
     return d
 
 def row_to_dto(row):
@@ -121,5 +121,5 @@ def migrate_excel(file_path):
         user = user_from_row(row)
         dtos.append(dto)
         print("saving row")
-        amea_ath_service.save(user, contact, personal, student, classStud)
+        amea_thes_service.save(user, contact, personal, student, classStud)
     
