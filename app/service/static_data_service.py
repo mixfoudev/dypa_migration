@@ -68,7 +68,9 @@ def edu_exists(dypaId, name):
         for e in dypaSchools:
             edu_ids[e['name']]=e['id']
             amRes = q.get_ams_for_edu(e['id'])
-            edu_ams[e['id']] = [s[0] for s in amRes]
+            #print("amRes:", amRes)
+            edu_ams[e['id']] = [s['am'] for s in amRes]
+            #print("edu_ams" ,edu_ams[e['id']])
     #print("aaaa hashedu:", hash_edu)
     #print(f"name: '{name}'")
     return name in [s['name'] for s in hash_edu[dypaId]]

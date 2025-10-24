@@ -38,10 +38,10 @@ def user_from_row(row):
     d['vat'] = row['ΑΦΜ'].strip()
     d['lastname'] = row['ΕΠΩΝΥΜΟ'].strip()
     d['name'] = row['ΟΝΟΜΑ'].strip()
-    d['flastname'] = row['ΕΠΩΝΥΜΟ ΠΑΤΕΡΑ'].strip()
     d['fname'] = row['ΟΝΟΜΑ ΠΑΤΕΡΑ'].strip()
-    d['mlastname'] = row['ΕΠΩΝΥΜΟ ΜΗΤΕΡΑΣ'].strip()
-    d['mname'] = row['ΟΝΟΜΑ ΜΗΤΕΡΑΣ'].strip()
+    d['flastname'] = row['ΕΠΩΝΥΜΟ ΠΑΤΕΡΑ'].strip() if pd.notna(row['ΕΠΩΝΥΜΟ ΠΑΤΕΡΑ']) else None
+    d['mlastname'] = row['ΕΠΩΝΥΜΟ ΜΗΤΕΡΑΣ'].strip() if pd.notna(row['ΕΠΩΝΥΜΟ ΜΗΤΕΡΑΣ']) else None
+    d['mname'] = row['ΟΝΟΜΑ ΜΗΤΕΡΑΣ'].strip() if pd.notna(row['ΟΝΟΜΑ ΜΗΤΕΡΑΣ']) else None
     d['dob'] = row['ΗΜ/ΝΙΑ ΓΕΝΝΗΣΗΣ'].strip()
     d['gender'] = row['ΦΥΛΟ'].strip()
     return d
@@ -49,17 +49,17 @@ def user_from_row(row):
 def personal_from_row(row):
     d ={}
     d['amka'] = row['ΑΜΚΑ'].strip()
-    d['ama'] = row['ΑΜΑ'].strip()
+    d['ama'] = row['ΑΜΑ'].strip() if pd.notna(row['ΑΜΑ']) else None
+    d['iban'] = row['IBAN'].strip() if pd.notna(row['IBAN']) else None
     d['identity'] = row['ΑΔΤ'].strip()
-    d['iban'] = row['IBAN'].strip()
-    d['maleRegId'] = row['ΑΜ ΑΡΡΕΝΩΝ'].strip()
-    d['makeRegPlace'] = row['ΤΟΠ ΕΓΓ Μ.Α'].strip()
-    d['citizenship'] = row['ΥΠΗΚΟΟΤΗΤΑ'].strip()
+    d['maleRegId'] = row['ΑΜ ΑΡΡΕΝΩΝ'].strip() if pd.notna(row['ΑΜ ΑΡΡΕΝΩΝ']) else None
+    d['makeRegPlace'] = row['ΤΟΠ ΕΓΓ Μ.Α'].strip() if pd.notna(row['ΤΟΠ ΕΓΓ Μ.Α']) else None
+    d['citizenship'] = row['ΥΠΗΚΟΟΤΗΤΑ'].strip() if pd.notna(row['ΥΠΗΚΟΟΤΗΤΑ']) else None
     return d
 
 def student_from_row(row):
     d ={}
-    d['kpa'] = row['ΚΠΑ'].strip()
+    d['kpa'] = row['ΚΠΑ'].strip() if pd.notna(row['ΚΠΑ']) else None
     d['am'] = row['ΑΜ'].strip()
     d['dateRegister'] = row['ΗΜΝΙΑ ΕΓΓΡΑΦΗΣ'].strip()
     d['acYearRegister'] = row['ΑΚΑΔ. ΕΤΟΣ ΕΓΓΡΑΦΗΣ'].strip()
@@ -79,10 +79,10 @@ def row_to_dto(row):
     d['vat'] = row['ΑΦΜ'].strip()
     d['lastname'] = row['ΕΠΩΝΥΜΟ'].strip()
     d['name'] = row['ΟΝΟΜΑ'].strip()
-    d['flastname'] = row['ΕΠΩΝΥΜΟ ΠΑΤΕΡΑ'].strip()
     d['fname'] = row['ΟΝΟΜΑ ΠΑΤΕΡΑ'].strip()
-    d['mlastname'] = row['ΕΠΩΝΥΜΟ ΜΗΤΕΡΑΣ'].strip()
-    d['mname'] = row['ΟΝΟΜΑ ΜΗΤΕΡΑΣ'].strip()
+    d['flastname'] = row['ΕΠΩΝΥΜΟ ΠΑΤΕΡΑ'].strip() if pd.notna(row['ΕΠΩΝΥΜΟ ΠΑΤΕΡΑ']) else None
+    d['mlastname'] = row['ΕΠΩΝΥΜΟ ΜΗΤΕΡΑΣ'].strip() if pd.notna(row['ΕΠΩΝΥΜΟ ΜΗΤΕΡΑΣ']) else None
+    d['mname'] = row['ΟΝΟΜΑ ΜΗΤΕΡΑΣ'].strip() if pd.notna(row['ΟΝΟΜΑ ΜΗΤΕΡΑΣ']) else None
     d['dob'] = row['ΗΜ/ΝΙΑ ΓΕΝΝΗΣΗΣ'].strip()
     d['gender'] = row['ΦΥΛΟ'].strip()
     d['email'] = row['EMAIL'].strip()
@@ -93,11 +93,11 @@ def row_to_dto(row):
     d['city'] = row['ΠΟΛΗ'].strip()
     d['zipcode'] = row['ΤΚ'].strip()#20
     d['amka'] = row['ΑΜΚΑ'].strip()
-    d['ama'] = row['ΑΜΑ'].strip()
-    d['iban'] = row['IBAN'].strip()
-    d['maleRegId'] = row['ΑΜ ΑΡΡΕΝΩΝ'].strip()
-    d['makeRegPlace'] = row['ΤΟΠ ΕΓΓ Μ.Α'].strip()
-    d['kpa'] = row['ΚΠΑ'].strip()
+    d['ama'] = row['ΑΜΑ'].strip() if pd.notna(row['ΑΜΑ']) else None
+    d['iban'] = row['IBAN'].strip() if pd.notna(row['IBAN']) else None
+    d['maleRegId'] = row['ΑΜ ΑΡΡΕΝΩΝ'].strip() if pd.notna(row['ΑΜ ΑΡΡΕΝΩΝ']) else None
+    d['makeRegPlace'] = row['ΤΟΠ ΕΓΓ Μ.Α'].strip() if pd.notna(row['ΤΟΠ ΕΓΓ Μ.Α']) else None
+    d['kpa'] = row['ΚΠΑ'].strip() if pd.notna(row['ΚΠΑ']) else None
     d['am'] = row['ΑΜ'].strip()
     d['dateRegister'] = row['ΗΜΝΙΑ ΕΓΓΡΑΦΗΣ'].strip()
     d['acYearRegister'] = row['ΑΚΑΔ. ΕΤΟΣ ΕΓΓΡΑΦΗΣ'].strip()

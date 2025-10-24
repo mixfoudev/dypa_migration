@@ -206,7 +206,7 @@ def validate_excel(file_path):
                 unique_ams[sxoli].append(am)
             else: row_errors[key].append("Διπλότυπος ΑΜ για την σχολή " + sxoli)
             #
-            if am in staticService.get_edu_ams(dypaId, sxoli):
+            if int(am) in staticService.get_edu_ams(dypaId, sxoli):
                 row_errors[key].append("Ο ΑΜ υπάρχει στο σύστημα για την σχολή " + sxoli)
         if "ΑΔΤ" not in err:
             adt = row['ΑΔΤ']
