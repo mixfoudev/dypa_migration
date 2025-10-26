@@ -14,12 +14,6 @@ COLUMNS = [
 
 dypaId = 33
 
-def calc_period(tp):
-    if not tp: return None
-    if tp.upper() in ["Α", "Α'", "Α ΤΆΞΗ", "Α ΤΑΞΗ"]: return 1
-    if tp.upper() in ["Β", "Β'", "Β ΤΆΞΗ", "Β ΤΑΞΗ"]: return 2
-    return None
-
 def check_academic_years(df):
     ac = df['ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ'].unique().tolist()
     reg = df['ΑΚΑΔ. ΕΤΟΣ ΕΓΓΡΑΦΗΣ'].unique().tolist()
@@ -126,7 +120,7 @@ def validate_field(row, field_name, value, err):
 
 
     elif field_name == "ΕΤΟΣ":
-        return pd.notna(value) and int(value) == 2
+        return pd.notna(value) and 2 >= int(value) <= 5
     
     elif field_name == "ΣΧΟΛΗ":
         return pd.notna(value) and staticService.edu_exists(dypaId, value)

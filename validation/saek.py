@@ -4,15 +4,25 @@ from app.service import static_data_service as staticService
 
 # expected columns
 COLUMNS = [
-    "ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ", "ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ", "ΕΤΟΣ", "ΠΑΘΗΣΗ ΚΕΠΑ", "ΕΙΔΙΚΟΤΗΤΑ",  "ΑΦΜ", "ΕΠΩΝΥΜΟ", "ΟΝΟΜΑ",
-    "ΕΠΩΝΥΜΟ ΠΑΤΕΡΑ", "ΟΝΟΜΑ ΠΑΤΕΡΑ", "ΕΠΩΝΥΜΟ ΜΗΤΕΡΑΣ", "ΟΝΟΜΑ ΜΗΤΕΡΑΣ", "ΥΠΗΚΟΟΤΗΤΑ",
+    "ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ", "ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ", "ΕΞΑΜΗΝΟ", "ΕΙΔΙΚΟΤΗΤΑ",  "ΑΦΜ", "ΕΠΩΝΥΜΟ", "ΟΝΟΜΑ",
+    "ΕΠΩΝΥΜΟ ΠΑΤΕΡΑ", "ΟΝΟΜΑ ΠΑΤΕΡΑ", "ΕΠΩΝΥΜΟ ΜΗΤΕΡΑΣ", "ΟΝΟΜΑ ΜΗΤΕΡΑΣ",
     "ΗΜ/ΝΙΑ ΓΕΝΝΗΣΗΣ", "ΦΥΛΟ", "EMAIL", "ΚΙΝΗΤΟ ΤΗΛ", "ΣΤΑΘΕΡΟ ΤΗΛ",
-    "ΔΙΕΥΘΥΝΣΗ", "ΑΡΙΘΜΟΣ", "ΠΟΛΗ", "ΤΚ", "ΑΜΚΑ", "ΑΜΑ","ΑΔΤ","IBAN", "ΑΜ ΑΡΡΕΝΩΝ",
-    "ΤΟΠ ΕΓΓ Μ.Α", "ΚΠΑ", "ΑΜ","ΗΜΝΙΑ ΕΓΓΡΑΦΗΣ", "ΑΚΑΔ. ΕΤΟΣ ΕΓΓΡΑΦΗΣ", "ΣΧΟΛΗ"
-    ,"ΑΔΙΚ.ΑΠΟΥΣΙΕΣ","ΔΙΚΑΙΟΛ. ΑΠΟΥΣΙΕΣ","ΒΑΘΜΟΣ Μ.Ο"
+    "ΔΙΕΥΘΥΝΣΗ", "ΑΡΙΘΜΟΣ", "ΠΟΛΗ", "ΤΚ", "ΑΜΚΑ", "ΑΜΑ", "ΤΟΠΟΣ ΓΕΝΝΗΣΗΣ","ΑΔΤ",
+    "ΔΗΜΟΣ ΕΓΓΡΑΦΗΣ", "ΑΡ. ΔΗΜΟΤΟΛΟΓ", "ΧΩΡΑ", "IBAN", "ΑΜ ΑΡΡΕΝΩΝ",
+    "ΤΟΠ ΕΓΓ Μ.Α", "ΚΠΑ","ΑΜ",
+    "ΗΜΝΙΑ ΕΓΓΡΑΦΗΣ", "ΑΚΑΔ. ΕΤΟΣ ΕΓΓΡΑΦΗΣ", "ΣΧΟΛΗ"
+    ,"ΧΡΩΣΤΟΥΜ. ΜΑΘ. Α ΕΞΑΜ","ΧΡΩΣΤΟΥΜ. ΜΑΘ. Β ΕΞΑΜ","ΧΡΩΣΤΟΥΜ. ΜΑΘ. Γ ΕΞΑΜ","ΧΡΩΣΤΟΥΜ. ΜΑΘ. Δ ΕΞΑΜ"
 ]
 
-dypaId = 95
+dypaId = 3
+
+def calc_period(tp):
+    if not tp: return None
+    if tp.upper() in ["Α", "Α'", "Α ΕΞΑΜΗΝΟ", "Α ΕΞΆΜΗΝΟ"]: return 1
+    if tp.upper() in ["Β", "Β'", "Β ΕΞΑΜΗΝΟ", "Β ΕΞΆΜΗΝΟ"]: return 2
+    if tp.upper() in ["Γ", "Γ'", "Γ ΕΞΑΜΗΝΟ", "Γ ΕΞΆΜΗΝΟ"]: return 3
+    if tp.upper() in ["Δ", "Δ'", "Δ ΕΞΑΜΗΝΟ", "Δ ΕΞΆΜΗΝΟ"]: return 4
+    return None
 
 def check_academic_years(df):
     ac = df['ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ'].unique().tolist()
@@ -32,7 +42,7 @@ def check_academic_years(df):
             if not exist['periods']:
                 out.append({"name": ac, "exist": True,  "periods": 0})
             else:
-                tp = [s for s in exist['periods'] if s['dypa_inst_type_id'] == 5]
+                tp = [s for s in exist['periods'] if s['dypa_inst_type_id'] == dypaId]
                 out.append({"name": ac, "exist": True, "periods": len(tp)})
     #print("ac yeaaaaaaaaaaars: ", out)
     return out
@@ -88,9 +98,6 @@ def validate_field(row, field_name, value, err):
 
     elif field_name == "ΦΥΛΟ":
         return pd.notna(value) and str(value).strip().lower() in ["α", "θ"]
-    
-    elif field_name == "ΠΑΘΗΣΗ ΚΕΠΑ":
-        return pd.notna(value) and str(value).strip().upper() in ["ΚΩΦΩΣΗ", "ΛΟΙΠΕΣ ΟΡΓΑΝΙΚΕΣ ΠΑΘΗΣΕΙΣ","ΨΥΧΙΚΕΣ ΠΑΘΗΣΕΙΣ", "ΚΙΝΗΤΙΚΗ ΑΝΑΠΗΡΙΑ 50%+"]
 
     elif field_name == "ΤΚ":
         return pd.notna(value) and str(value).isdigit() and len(str(value)) == 5
@@ -106,25 +113,30 @@ def validate_field(row, field_name, value, err):
             return pd.notna(value) and validate_ac_year(value)
         except Exception as e:
             return False
-
-    # amea ath specific
-    if field_name == "ΒΑΘΜΟΣ Μ.Ο":
-        return pd.notna(value) and isNumber(value) and 9.5 < float(value) <= 20
     
-    if field_name == "ΑΔΙΚ.ΑΠΟΥΣΙΕΣ":
-        return pd.notna(value) and isNumber(value) and 0 < int(value) <= 70
-    
-    if field_name == "ΔΙΚΑΙΟΛ. ΑΠΟΥΣΙΕΣ":
-        return pd.notna(value) and isNumber(value) and 0 < int(value) <= 160
+    if field_name == "ΑΡΙΘ. ΦΟΙΤΗΣΕΩΝ":
+        return pd.notna(value) and isNumber(value, int) and 0 <= int(value) < 2
 
-    elif field_name == "ΕΤΟΣ":
-        return pd.notna(value) and int(value) == 2
+    elif field_name == "ΕΞΑΜΗΝΟ":
+        return pd.notna(value) and calc_period(value) in [1,2,3,4]
     
     elif field_name == "ΣΧΟΛΗ":
         return pd.notna(value) and staticService.edu_exists(dypaId, value)
     
     elif field_name == "ΧΩΡΑ":
         return pd.notna(value) and staticService.country_exists(value)
+    
+    elif field_name == "ΧΡΩΣΤΟΥΜ. ΜΑΘ. Α ΕΞΑΜ":
+        return pd.isna(value) or (isNumber(value, int) and staticService.lesson_exists(row['ΕΙΔΙΚΟΤΗΤΑ'], 1, value)) 
+    
+    elif field_name == "ΧΡΩΣΤΟΥΜ. ΜΑΘ. Β ΕΞΑΜ":
+        return pd.isna(value) or (isNumber(value, int) and staticService.lesson_exists(row['ΕΙΔΙΚΟΤΗΤΑ'], 2, value)) 
+    
+    elif field_name == "ΧΡΩΣΤΟΥΜ. ΜΑΘ. Γ ΕΞΑΜ":
+        return pd.isna(value) or (isNumber(value, int) and staticService.lesson_exists(row['ΕΙΔΙΚΟΤΗΤΑ'], 3, value)) 
+    
+    elif field_name == "ΧΡΩΣΤΟΥΜ. ΜΑΘ. Δ ΕΞΑΜ":
+        return pd.isna(value) or (isNumber(value, int) and staticService.lesson_exists(row['ΕΙΔΙΚΟΤΗΤΑ'], 4, value)) 
 
     return True
 
@@ -150,7 +162,6 @@ def eduSpecMissing(row, err):
 def validate_excel(file_path):
     df = pd.read_excel(file_path, dtype=str)
     data = {"errors": None,"section_students": None,"students": None}
-    #print(df.head())
 
     errors = set(COLUMNS) - set(df.columns)
     if errors:

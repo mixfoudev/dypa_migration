@@ -1,4 +1,4 @@
-from . import amea_thess, epas, pepas, amea_ath
+from . import amea_thess, epas, pepas, amea_ath, saek
 
 def migrate_school(id, filepath):
     print("migrate_school id:", id, "filepath: ", filepath)
@@ -13,7 +13,7 @@ def migrate_school(id, filepath):
         return errors
     elif id == 3:
         print("migrating saek")
-        #epas.migrate_excel(filepath)
+        saek.migrate_excel(filepath)
         return errors
     elif id == 33:
         print("migrating amea thess")

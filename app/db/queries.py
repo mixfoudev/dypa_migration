@@ -37,6 +37,14 @@ def get_student_specs(dypaId):
         with db.cursor() as cursor:
             cursor.execute(f"SELECT * FROM student_specialties where dypa_institution_type_id={dypaId}")
             return cursor.fetchall()
+        
+def get_student_period_lessons(specId, periodNum):
+    db = current_app.config['DB']
+    print(f"DB. fetching lessons spec:{specId} and period:{periodNum} ")
+    with db.cursor() as cursor:
+            cursor.execute(f"SELECT id FROM aa_lessons where student_specialty_id={specId} and period_num={periodNum}")
+            return cursor.fetchall()
+        
     
 def get_edu_year_spec(eduId, acYearId, specId):
     db = current_app.config['DB']

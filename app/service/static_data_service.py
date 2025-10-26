@@ -10,6 +10,7 @@ edu_year_specs = {}
 edu_ids = {}
 edu_ams = {}
 spec_ids = {}
+spec_period_lessons = {}
 class_lessons = {}
 class_lessonsEpas = {}
 
@@ -74,6 +75,16 @@ def edu_exists(dypaId, name):
     #print("aaaa hashedu:", hash_edu)
     #print(f"name: '{name}'")
     return name in [s['name'] for s in hash_edu[dypaId]]
+
+def lesson_exists(spec, period, lessonId):
+    if not spec in spec_ids.keys(): return False
+    key = f"{spec}-{period}"
+    if not key in spec_period_lessons.keys():
+        specId = spec_ids[spec]
+        res = q.get_student_period_lessons(specId, period)
+        spec_period_lessons[key] = [s['id'] for s in res]
+    #print("spec_period_lessons[key]: ", spec_period_lessons[key])
+    return int(lessonId) in spec_period_lessons[key]
 
 def get_edu_ams(dypaId, name):
     if not edu_exists(dypaId, name): return []
