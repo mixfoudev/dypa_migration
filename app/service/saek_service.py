@@ -7,18 +7,23 @@ import uuid
 def save(user, contact, personal, student, classStud):
     db = current_app.config['DB']
     dypaId = 3
+    onlyPart = student['onlyPart']
     try:
         eduId = staticService.get_edu_id(student.get('edu'))
+        specId = staticService.spec_ids[student.get('spec')]
         eduSpec = staticService.get_edu_year_spec(student.get('edu'), classStud.get('acYear'), classStud.get('spec'))
-        section = staticService.get_class_section_id(dypaId, classStud.get('section'))
-        classId = section['id']
-        print("classId", classId)
-        inputAcYearId = section['academic_year_id']
-        teachPeriodId = section['teach_period_id']
-        periodNum = section['period_num']
+        if not onlyPart:
+            section = staticService.get_class_section_id(dypaId, classStud.get('section'))
+            classId = section['id']
+            print("classId", classId)
+            inputAcYearId = section['academic_year_id']
+            teachPeriodId = section['teach_period_id']
+            periodNum = section['period_num']
+        else:
+            periodNum = 4
         #print("periodNum", periodNum)
 
-        if not eduId or not eduSpec or not classId:
+        if not eduId or not eduSpec or (not onlyPart and not classId):
             print(f"saek save: can not find eduId : {eduId} or eduSpec: {eduSpec} or classid: {classId} . Aborting")
             return False
         
@@ -36,12 +41,14 @@ def save(user, contact, personal, student, classStud):
             stUuid = str(uuid.uuid4())
             studentId = s.createStudent(student, userId, contactId, eduSpecId, eduId, personalId, dypaId, fieldsId, stUuid, srUuid, cursor)
             print("studentId : ", studentId)
-            classStudId = s.createClassStudent(classStud, studentId, inputAcYearId, classId, teachPeriodId ,cursor)
-            print("classStudId : ", classStudId)
-            classLessons = staticService.get_class_lessonsEpas(classId)
-            # if student.get('attendGeneralLesson') == 'ΟΧΙ':
-            #     classLessons = [l for l in classLessons if l['epas_lesson_type'] != 'GENERAL']
-            s.createClassStudentLessons(classLessons, studentId, classStudId, periodNum, dypaId, cursor)
+
+            if not onlyPart:
+                classStudId = s.createClassStudent(classStud, studentId, inputAcYearId, classId, teachPeriodId ,cursor)
+                print("classStudId : ", classStudId)
+                classLessons = staticService.get_class_lessons(classId)
+                s.createClassStudentLessons(classLessons, studentId, classStudId, periodNum, dypaId, cursor)
+                print("saved class lessons")
+            s.createPendingLessons(student, studentId, eduId, specId, periodNum, cursor)
         db.commit()
         return True
     except Exception as e:

@@ -14,7 +14,10 @@ COLUMNS = [
     ,"ΧΡΩΣΤΟΥΜ. ΜΑΘ. Α ΕΞΑΜ","ΧΡΩΣΤΟΥΜ. ΜΑΘ. Β ΕΞΑΜ","ΧΡΩΣΤΟΥΜ. ΜΑΘ. Γ ΕΞΑΜ","ΧΡΩΣΤΟΥΜ. ΜΑΘ. Δ ΕΞΑΜ"
 ]
 
+pending_cols=["ΧΡΩΣΤΟΥΜ. ΜΑΘ. Α ΕΞΑΜ","ΧΡΩΣΤΟΥΜ. ΜΑΘ. Β ΕΞΑΜ","ΧΡΩΣΤΟΥΜ. ΜΑΘ. Γ ΕΞΑΜ","ΧΡΩΣΤΟΥΜ. ΜΑΘ. Δ ΕΞΑΜ"]
+
 dypaId = 3
+prev_years =[]
 
 def calc_period(tp):
     if not tp: return None
@@ -24,11 +27,33 @@ def calc_period(tp):
     if tp.upper() in ["Δ", "Δ'", "Δ ΕΞΑΜΗΝΟ", "Δ ΕΞΆΜΗΝΟ"]: return 4
     return None
 
+def validate_pending_lesson(row, period):
+    print("validate_pending_lesson period:", period)
+    sameMsg = 'Δεν μπορεί να υπάρχει χρωστ. μάθημα στο ίδιο εξάμηνο πλήρους φοίτησης'
+    upperMsg = 'Δεν μπορεί να υπάρχει χρωστ. μάθημα σε εξάμηνο μεγαλύτερο της πλήρους φοίτησης'
+    if period is None: return "Μη έγκυρο εξάμηνο" # should never
+    if period ==1: 
+        if pd.notna(row['ΧΡΩΣΤΟΥΜ. ΜΑΘ. Α ΕΞΑΜ']): return sameMsg
+        if pd.notna(row['ΧΡΩΣΤΟΥΜ. ΜΑΘ. Β ΕΞΑΜ']): return upperMsg
+        if pd.notna(row['ΧΡΩΣΤΟΥΜ. ΜΑΘ. Γ ΕΞΑΜ']): return upperMsg
+        if pd.notna(row['ΧΡΩΣΤΟΥΜ. ΜΑΘ. Δ ΕΞΑΜ']): return upperMsg
+    if period ==2: 
+        if pd.notna(row['ΧΡΩΣΤΟΥΜ. ΜΑΘ. Β ΕΞΑΜ']): return sameMsg
+        if pd.notna(row['ΧΡΩΣΤΟΥΜ. ΜΑΘ. Γ ΕΞΑΜ']): return upperMsg
+        if pd.notna(row['ΧΡΩΣΤΟΥΜ. ΜΑΘ. Δ ΕΞΑΜ']): return upperMsg
+    if period ==3: 
+        if pd.notna(row['ΧΡΩΣΤΟΥΜ. ΜΑΘ. Γ ΕΞΑΜ']): return sameMsg
+        if pd.notna(row['ΧΡΩΣΤΟΥΜ. ΜΑΘ. Δ ΕΞΑΜ']): return upperMsg
+    if period ==4: 
+        if pd.notna(row['ΧΡΩΣΤΟΥΜ. ΜΑΘ. Δ ΕΞΑΜ']): return sameMsg
+    return None
+
 def check_academic_years(df):
     ac = df['ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ'].unique().tolist()
     reg = df['ΑΚΑΔ. ΕΤΟΣ ΕΓΓΡΑΦΗΣ'].unique().tolist()
-    un = list(set(ac + reg))
+    un = list(set(ac + reg + prev_years))
     ac_years = [s for s in un if validate_ac_year(s)]
+    
     #ac_years.sort()
     # print(ac)
     # print(reg)
@@ -153,6 +178,18 @@ def update_row_data_info(row, students,section_students, err):
     section_students[sec]['exist'] = staticService.class_section_exists(dypaId, sec, acYear)
     students["data"].append({"vat":vat, "lastname":lastname, "name":name})
 
+def update_part_row_data_info(row, students, part_students, err):
+    for s in ['ΑΦΜ', 'ΟΝΟΜΑ', 'ΕΠΩΝΥΜΟ', 'ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ', 'ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ']:
+        if s in err: return
+    vat = row['ΑΦΜ']
+    name = row['ΟΝΟΜΑ']
+    lastname = row['ΕΠΩΝΥΜΟ']
+    # sec = row['ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ']
+    acYear = row['ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ']
+    if not 'data' in part_students.keys(): part_students['data'] = []
+    part_students['data'].append(vat)
+    students["data"].append({"vat":vat, "lastname":lastname, "name":name})
+
 def eduSpecMissing(row, err):
     for s in ['ΕΙΔΙΚΟΤΗΤΑ', 'ΣΧΟΛΗ', 'ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ']: 
         if s in err: True
@@ -179,11 +216,15 @@ def validate_excel(file_path):
     unique_ams = {}
     students = {"total": 0, "data": []}
     section_students = {}
+    part_students = {}
     row_errors={}
     existing_students = []
     
     for i, row in df.iterrows():
         err = []
+        #ownsLesson = pd.notna(row['ΧΡΩΣΤΟΥΜ. ΜΑΘ. Α ΕΞΑΜ']) or pd.notna(row['ΧΡΩΣΤΟΥΜ. ΜΑΘ. Β ΕΞΑΜ']) or pd.notna(row['ΧΡΩΣΤΟΥΜ. ΜΑΘ. Γ ΕΞΑΜ']) or pd.notna(row['ΧΡΩΣΤΟΥΜ. ΜΑΘ. Δ ΕΞΑΜ'])
+        onlyPart = pd.isna(row['ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ']) and pd.isna(row['ΕΞΑΜΗΝΟ']) and pd.notna(row['ΧΡΩΣΤΟΥΜ. ΜΑΘ. Δ ΕΞΑΜ'])
+        print("onlyPart", onlyPart)
         key = i+2
         if not key in row_errors: row_errors[key] = []
 
@@ -191,11 +232,41 @@ def validate_excel(file_path):
             if field not in row: continue
             val = row[field]
             if type(val) == str: val = val.strip()
+            if onlyPart and field in ['ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ','ΕΞΑΜΗΝΟ']: continue
+            if field == 'ΧΡΩΣΤΟΥΜ. ΜΑΘ. Δ ΕΞΑΜ' and pd.notna(row['ΧΡΩΣΤΟΥΜ. ΜΑΘ. Δ ΕΞΑΜ']) and (pd.notna(row['ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ']) or pd.notna(row['ΕΞΑΜΗΝΟ']) ):
+                print("aaaaaaaaaaa")
+                err.append(field)
+                row_errors[key].append(field) 
+                continue
             if not validate_field(row ,field, val, err):
                 err.append(field)
                 row_errors[key].append(field)    
         
-        update_row_data_info(row, students, section_students, err)
+        if not onlyPart and 'ΕΞΑΜΗΝΟ' not in err:
+            period = calc_period(row['ΕΞΑΜΗΝΟ'])
+            valError = validate_pending_lesson(row, period)
+            if valError: row_errors[key].append(valError)
+            else:
+                # check prev years
+                if 'ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ' not in err:
+                    needsPrev = _needsPrevYear(period, row)
+                    if needsPrev:
+                        acYearL = row['ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ'].split("/")
+                        prevStr = f"{int(acYearL[0])-1}/{int(acYearL[1])-1}"
+                        if prevStr not in prev_years: prev_years.append(prevStr)
+
+        if onlyPart:
+            period = 4
+            # check prev years
+            if 'ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ' not in err:
+                needsPrev = _needsPrevYear(period, row)
+                if needsPrev:
+                    acYearL = row['ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ'].split("/")
+                    prevStr = f"{int(acYearL[0])-1}/{int(acYearL[1])-1}"
+                    if prevStr not in prev_years: prev_years.append(prevStr)
+
+        if onlyPart: update_part_row_data_info(row, students, part_students, err)
+        else: update_row_data_info(row, students, section_students, err)
         if "ΑΦΜ" not in err:
             vat = row['ΑΦΜ']
             if vat not in unique_vats:
@@ -231,11 +302,16 @@ def validate_excel(file_path):
         errors.append(f"Σειρά: {rk} - Μη έγκυρες τιμές: {', '.join(row_errors[rk])}")
     
     students['data'] = sorted(students["data"], key=lambda x: x['lastname'])
-    data = {"errors": errors,"section_students": section_students,"students": students if len(students['data']) > 0 else None}
+    data = {"errors": errors,"section_students": section_students,"students": students if len(students['data']) > 0 else None, "part_students": part_students}
     acYears = check_academic_years(df)
     data['ac_years'] = sorted(acYears, key=lambda x: x['name'])
     data['existing_students'] = existing_students
     return data
+
+def _needsPrevYear(periodNum, row):
+    if periodNum in [1,3] and (pd.notna(row['ΧΡΩΣΤΟΥΜ. ΜΑΘ. Α ΕΞΑΜ']) or pd.notna(row['ΧΡΩΣΤΟΥΜ. ΜΑΘ. Γ ΕΞΑΜ'])): return True
+    if periodNum in [2,4] and (pd.notna(row['ΧΡΩΣΤΟΥΜ. ΜΑΘ. Β ΕΞΑΜ']) or pd.notna(row['ΧΡΩΣΤΟΥΜ. ΜΑΘ. Δ ΕΞΑΜ'])): return True
+    return False
 
 # if __name__ == "__main__":
 #     errors = validate_excel("data/epas.xlsx") 

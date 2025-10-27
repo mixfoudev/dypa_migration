@@ -16,11 +16,12 @@ COLUMNS = [
 ]
 
 def section_from_row(row):
+    onlyPart = pd.isna(row['ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ']) and pd.isna(row['ΕΞΑΜΗΝΟ']) and pd.notna(row['ΧΡΩΣΤΟΥΜ. ΜΑΘ. Δ ΕΞΑΜ'])
     d ={}
-    d['section'] = row['ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ'].strip()
+    d['section'] = row['ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ'].strip() if not onlyPart else None
     d['acYear'] = row['ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ'].strip()
     d['spec'] = row['ΕΙΔΙΚΟΤΗΤΑ'].strip()
-    d['period'] = row['ΕΞΑΜΗΝΟ'].strip() # TODO
+    d['period'] = row['ΕΞΑΜΗΝΟ'].strip() if not onlyPart else 'Δ'
     d['grade'] = None
     d['studyNum'] = None #row['ΑΡΙΘ. ΦΟΙΤΗΣΕΩΝ'].strip()
     return d
@@ -79,11 +80,12 @@ def student_from_row(row):
     return d
 
 def row_to_dto(row):
+    onlyPart = pd.isna(row['ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ']) and pd.isna(row['ΕΞΑΜΗΝΟ']) and pd.notna(row['ΧΡΩΣΤΟΥΜ. ΜΑΘ. Δ ΕΞΑΜ'])
     d ={}
-    d['section'] = row['ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ'].strip()
+    d['section'] = row['ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ'].strip() if not onlyPart else None
     d['acYear'] = row['ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ'].strip()
     d['spec'] = row['ΕΙΔΙΚΟΤΗΤΑ'].strip()
-    d['period'] = row['ΕΞΑΜΗΝΟ'].strip()
+    d['period'] = row['ΕΞΑΜΗΝΟ'].strip() if not onlyPart else 'Δ'
     d['vat'] = row['ΑΦΜ'].strip()
     d['lastname'] = row['ΕΠΩΝΥΜΟ'].strip()
     d['name'] = row['ΟΝΟΜΑ'].strip()
@@ -198,8 +200,10 @@ def validate_field(field_name, value):
 
 def migrate_excel(file_path):
     df = pd.read_excel(file_path, dtype=str)
+    
     dtos = []
     for i, row in df.iterrows():
+        onlyPart = pd.isna(row['ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ']) and pd.isna(row['ΕΞΑΜΗΝΟ']) and pd.notna(row['ΧΡΩΣΤΟΥΜ. ΜΑΘ. Δ ΕΞΑΜ'])
         dto = row_to_dto(row)
         classStud = section_from_row(row)
         contact = contact_from_row(row)
@@ -207,6 +211,7 @@ def migrate_excel(file_path):
         student = student_from_row(row)
         user = user_from_row(row)
         dtos.append(dto)
+        student['onlyPart'] = onlyPart
         print("saving row")
         saek_service.save(user, contact, personal, student, classStud)
     

@@ -309,3 +309,28 @@ def insert_amea_registration(values, cursor=None):
         db.rollback()
         print("❌ DB Amea student reg insert error:", e)
         return False
+    
+
+def insert_pending_lesson(values, cursor=None):
+    sql = """INSERT INTO `student_transfer_pending_lessons` (`created_at`, `updated_at`, `edu_id`, `is_pending`, `lesson_id`, `period_num`, `spec_id`,
+      `student_group_id`, `student_id`, `trasfer_app_id`, `class_student_lesson_id`, `academic_year_id`, `teach_period_id`)
+        VALUES (now(), now(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+    print("Creating pending lesson with values: ",values)
+    if cursor:
+        print("cursor exists")  
+        cursor.execute(sql, (values))
+        new_id = cursor.lastrowid
+        return new_id
+    print("cursor not exist. creating...")
+    db = current_app.config['DB']
+    try:
+        with db.cursor() as cursor:
+            cursor.execute(sql, (values))
+            new_id = cursor.lastrowid
+        db.commit()
+        return new_id
+    except Exception as e:
+        db.rollback()
+        print("❌ DB pending lesson insert error:", e)
+        return False

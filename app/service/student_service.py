@@ -1,3 +1,4 @@
+from csv import Error
 from app.db import queries as sq
 from app.db import student_queries as q
 from app.service import static_data_service as staticService
@@ -284,3 +285,59 @@ def createStudentAmeaFields(dto, userId, healthId, contactId, eduSpecId, eduId, 
     values.append(dto.get('edu_spec2_id'))
     values.append('MIGRATION') # reg_type
     return q.insert_amea_registration(values, cursor)
+
+def createPendingLessons(dto,  studId, eduId, specId, periodNum,cursor=None):
+    lesIds = []
+    perNums = []
+    for i in range(1,5):
+        k = 'pendLes'+str(i)
+        if dto[k]:
+            #print(k, ":", dto[k])
+            lesIds.append(int(dto[k]))
+            perNums.append(i)
+    if len(lesIds) == 0: 
+        print("no pending lessons found")
+        return # return if no pending lessons found
+    acYear = dto.get('acYearRegister')
+    acYearId = staticService.get_acYear_id(acYear)
+    acYearModel = staticService.get_ac_year(acYear)
+    #print("acYearModel", acYearModel)
+    prevYearId = None
+    prevYearModel = None
+    needsPrev = _needsPrevYear(periodNum, dto)
+    if needsPrev:
+        print("_needsPrevYear")
+        acYearL = acYear.split("/")
+        prevStr = f"{int(acYearL[0])-1}/{int(acYearL[1])-1}"
+        prevYearModel = staticService.get_ac_year(prevStr)
+        prevYearId = staticService.get_acYear_id(prevStr)
+        if not prevYearId: raise Error("prevYearId is null")
+        print(f"prev year= {prevYearId}:{prevStr}")
+    
+    print(f"creating {len(lesIds)} pending lessons")
+    
+    
+    mod = periodNum % 2
+    for i in range(0, len(lesIds)):
+        year = acYearModel if not needsPrev or (perNums[i] % 2 == mod) else prevYearModel
+        period = [p for p in year['periods'] if int(p['dypa_inst_type_id']) == 3 and int(p['num']) == perNums[i]][0]
+        print(f"save acYearId= {acYearId}")
+        print(f"save period= {period}")
+        values = []
+        values.append(eduId) # edu_id
+        values.append(1) # is_pending
+        values.append(lesIds[i]) # lesson_id
+        values.append(perNums[i]) # period_num
+        values.append(specId) # spec_id
+        values.append(studId) # stud_group_id
+        values.append(studId) # student_id
+        values.append(None) # transfer_app_id
+        values.append(None) # class_stud_lesson_id
+        values.append(year['id']) # academic_year_id
+        values.append(period['id']) # teach_period_id
+        q.insert_pending_lesson(values,cursor)
+
+def _needsPrevYear(periodNum, dto):
+    if periodNum in [1,3] and (dto['pendLes1']or dto['pendLes3']): return True
+    if periodNum in [2,4] and (dto['pendLes2']or dto['pendLes4']): return True
+    return False

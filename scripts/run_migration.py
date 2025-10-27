@@ -45,6 +45,7 @@ with app.app_context():
     errors = data['errors']
 
     sections = data['section_students']
+    part_students = data['part_students'] if "part_students" in data.keys() else []
     #print(data)
     error_sections = []
     if sections:
@@ -52,7 +53,8 @@ with app.app_context():
         error_sections = [s for k,s in sections.items() if not s['exist']]
         sections = [s for k,s in sections.items() if s['exist']]
 
-    if not errors and (sections and not error_sections):
+    valid = (sections and not error_sections) or part_students
+    if not errors and valid:
         #✅❌
         print("✅ Everything seems OK.")
         print("Running migration")

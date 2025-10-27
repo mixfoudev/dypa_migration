@@ -110,10 +110,12 @@
             </table>
             {% endif %}
 
-
-            {% if data.section_students %}
+            {% if data.section_students or data.part_students or data.students %}
             <h2>ΔΕΔΟΜΕΝΑ</h2>
             <p>Παρατηρήστε τα δεδομένα μήπως υπάρχει και κάποιο λογικό λάθος.</p>
+             {% endif %}
+
+            {% if data.section_students %}            
             <h3>Τμήματα: {{data.section_students|length}}</h3>
             <table class="styled-table">
                 <thead>
@@ -130,6 +132,10 @@
 
                 </tbody>
             </table>
+            {% endif %}
+
+            {% if data.part_students %}
+            <h3>Μερική Φοίτησης: {{data.part_students|length}}</h3>
             {% endif %}
 
             {% if data.students %}
