@@ -161,7 +161,8 @@ def createClassStudent(dto, studentId, acId, sectionId, teachPeriodId,cursor=Non
     values.append(0) # classes_after
     values.append(dto.get('after_class_num'))
     # add also mig abs as initial abs
-    values.append(dto.get('abs') if dto.get('abs') else 0) # abs
+    total_abs = (dto.get('abs') if dto.get('abs') else 0) + (dto.get('justAbs') if dto.get('justAbs') else 0)
+    values.append(total_abs) # abs
     values.append(dto.get('justAbs') if dto.get('justAbs') else 0) # just_abs
     # values.append(0) # abs
     # values.append(0) # just_abs
