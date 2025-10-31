@@ -12,8 +12,9 @@ def save(user, contact, personal, student, classStud):
         eduId = staticService.get_edu_id(student.get('edu'))
         specId = staticService.spec_ids[student.get('spec')]
         eduSpec = staticService.get_edu_year_spec(student.get('edu'), classStud.get('acYear'), classStud.get('spec'))
+        inputAcYearId = staticService.get_acYear_id(classStud.get('acYear'))
         if not onlyPart:
-            section = staticService.get_class_section_id(dypaId, classStud.get('section'))
+            section = staticService.get_class_section_id(dypaId, classStud.get('section'), classStud.get('periodNum'), inputAcYearId)
             classId = section['id']
             print("classId", classId)
             inputAcYearId = section['academic_year_id']

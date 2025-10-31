@@ -4,12 +4,13 @@ from app.service import static_data_service as staticService
 
 # expected columns
 COLUMNS = [
-    "ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ", "ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ", "ΕΤΟΣ", "ΠΑΘΗΣΗ ΚΕΠΑ", "ΕΙΔΙΚΟΤΗΤΑ",  "ΑΦΜ", "ΕΠΩΝΥΜΟ", "ΟΝΟΜΑ",
+    "ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ", "ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ",  "ΠΑΘΗΣΗ ΚΕΠΑ", "ΕΙΔΙΚΟΤΗΤΑ",  "ΑΦΜ", "ΕΠΩΝΥΜΟ", "ΟΝΟΜΑ",
     "ΕΠΩΝΥΜΟ ΠΑΤΕΡΑ", "ΟΝΟΜΑ ΠΑΤΕΡΑ", "ΕΠΩΝΥΜΟ ΜΗΤΕΡΑΣ", "ΟΝΟΜΑ ΜΗΤΕΡΑΣ", "ΥΠΗΚΟΟΤΗΤΑ",
     "ΗΜ/ΝΙΑ ΓΕΝΝΗΣΗΣ", "ΦΥΛΟ", "EMAIL", "ΚΙΝΗΤΟ ΤΗΛ", "ΣΤΑΘΕΡΟ ΤΗΛ",
     "ΔΙΕΥΘΥΝΣΗ", "ΑΡΙΘΜΟΣ", "ΠΟΛΗ", "ΤΚ", "ΑΜΚΑ", "ΑΜΑ","ΑΔΤ","IBAN", "ΑΜ ΑΡΡΕΝΩΝ",
     "ΤΟΠ ΕΓΓ Μ.Α", "ΚΠΑ", "ΑΜ","ΗΜΝΙΑ ΕΓΓΡΑΦΗΣ", "ΑΚΑΔ. ΕΤΟΣ ΕΓΓΡΑΦΗΣ", "ΣΧΟΛΗ"
     ,"ΑΔΙΚ.ΑΠΟΥΣΙΕΣ","ΔΙΚΑΙΟΛ. ΑΠΟΥΣΙΕΣ","ΒΑΘΜΟΣ Μ.Ο"
+    # "ΕΤΟΣ"
 ]
 
 dypaId = 95
@@ -99,7 +100,7 @@ def validate_field(row, field_name, value, err):
         return pd.notna(value) and staticService.spec_exists(dypaId, value)
     
     elif field_name == "ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ":
-        return pd.notna(value) and staticService.class_section_exists(dypaId, value, row['ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ'])
+        return pd.notna(value) and staticService.class_section_exists(dypaId, value, row['ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ'], 2)
     
     elif field_name in ["ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ", "ΑΚΑΔ. ΕΤΟΣ ΕΓΓΡΑΦΗΣ"]:
         try:
@@ -117,8 +118,8 @@ def validate_field(row, field_name, value, err):
     if field_name == "ΔΙΚΑΙΟΛ. ΑΠΟΥΣΙΕΣ":
         return pd.notna(value) and isNumber(value) and 0 < int(value) <= 160
 
-    elif field_name == "ΕΤΟΣ":
-        return pd.notna(value) and int(value) == 2
+    # elif field_name == "ΕΤΟΣ":
+    #     return pd.notna(value) and int(value) == 2
     
     elif field_name == "ΣΧΟΛΗ":
         return pd.notna(value) and staticService.edu_exists(dypaId, value)
@@ -138,7 +139,7 @@ def update_row_data_info(row, students,section_students, err):
     acYear = row['ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ']
     if not sec in section_students.keys(): section_students[sec] = {"name":sec,"total": 0, "exist": False, "data": []}
     section_students[sec]['data'].append(vat)
-    section_students[sec]['exist'] = staticService.class_section_exists(dypaId, sec, acYear)
+    section_students[sec]['exist'] = staticService.class_section_exists(dypaId, sec, acYear, 2)
     students["data"].append({"vat":vat, "lastname":lastname, "name":name})
 
 def eduSpecMissing(row, err):
@@ -170,6 +171,7 @@ def validate_excel(file_path):
     section_students = {}
     row_errors={}
     existing_students = []
+    periodNum = 2
     
     for i, row in df.iterrows():
         err = []

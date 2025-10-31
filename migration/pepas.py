@@ -22,6 +22,7 @@ def section_from_row(row):
     d['acYear'] = row['ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ'].strip()
     d['spec'] = row['ΕΙΔΙΚΟΤΗΤΑ'].strip()
     d['period'] = row['ΤΑΞΗ'].strip()
+    d['periodNum'] = int(calc_period(d['period']))
     d['grade'] = float(row['ΒΑΘΜΟΣ ΠΡΟΗΓ. ΤΑΞΗΣ'].strip())
     d['studyNum'] = row['ΑΡΙΘ. ΦΟΙΤΗΣΕΩΝ'].strip()
     return d

@@ -105,7 +105,8 @@ def validate_field(row, field_name, value, err):
         return pd.notna(value) and staticService.spec_exists(dypaId, value)
     
     elif field_name == "ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ":
-        return pd.notna(value) and staticService.class_section_exists(dypaId, value, row['ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ'])
+        period = int(calc_period(row['ΤΑΞΗ']))
+        return pd.notna(value) and staticService.class_section_exists(dypaId, value, row['ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ'], period)
     
     elif field_name in ["ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ", "ΑΚΑΔ. ΕΤΟΣ ΕΓΓΡΑΦΗΣ"]:
         try:
@@ -137,7 +138,6 @@ def validate_field(row, field_name, value, err):
     return True
 
 def update_row_data_info(row, students,section_students, err):
-    print("erreeeeeeeeeeeeeeeeeee",err)
     print("dypaId",dypaId)
     for s in ['ΑΦΜ', 'ΟΝΟΜΑ', 'ΕΠΩΝΥΜΟ', 'ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ', 'ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ']:
         if s in err: return
@@ -146,9 +146,10 @@ def update_row_data_info(row, students,section_students, err):
     lastname = row['ΕΠΩΝΥΜΟ']
     sec = row['ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ']
     acYear = row['ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ']
+    periodNum = calc_period(row['ΤΑΞΗ'])
     if not sec in section_students.keys(): section_students[sec] = {"name":sec,"total": 0, "exist": False, "data": []}
     section_students[sec]['data'].append(vat)
-    section_students[sec]['exist'] = staticService.class_section_exists(dypaId, sec, acYear)
+    section_students[sec]['exist'] = staticService.class_section_exists(dypaId, sec, acYear, int(periodNum))
     students["data"].append({"vat":vat, "lastname":lastname, "name":name})
 
 def eduSpecMissing(row, err):

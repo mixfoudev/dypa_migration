@@ -22,6 +22,7 @@ def section_from_row(row):
     d['acYear'] = row['ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ'].strip()
     d['spec'] = row['ΕΙΔΙΚΟΤΗΤΑ'].strip()
     d['period'] = row['ΕΞΑΜΗΝΟ'].strip() if not onlyPart else 'Δ'
+    d['periodNum'] = int(calc_period(d['period']))
     d['grade'] = None
     d['studyNum'] = None #row['ΑΡΙΘ. ΦΟΙΤΗΣΕΩΝ'].strip()
     return d
