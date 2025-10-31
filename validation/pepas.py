@@ -120,7 +120,7 @@ def validate_field(row, field_name, value, err):
     if field_name == "ΒΑΘΜΟΣ ΠΡΟΗΓ. ΤΑΞΗΣ":
         if "ΤΑΞΗ" in err: return False
         if calc_period(row['ΤΑΞΗ']) == 1: return True
-        return pd.notna(value) and isNumber(value) and 9.5 < float(value) <= 20
+        return pd.notna(value) and isNumber(value) and 9.5 <= float(value) <= 20
     
     if field_name == "ΑΡΙΘ. ΦΟΙΤΗΣΕΩΝ":
         return pd.notna(value) and isNumber(value, int) and 0 <= int(value) < 2

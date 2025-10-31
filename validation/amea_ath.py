@@ -109,7 +109,7 @@ def validate_field(row, field_name, value, err):
 
     # amea ath specific
     if field_name == "ΒΑΘΜΟΣ Μ.Ο":
-        return pd.notna(value) and isNumber(value) and 9.5 < float(value) <= 20
+        return pd.notna(value) and isNumber(value) and 10 < float(value) <= 20
     
     if field_name == "ΑΔΙΚ.ΑΠΟΥΣΙΕΣ":
         return pd.notna(value) and isNumber(value) and 0 < int(value) <= 70
