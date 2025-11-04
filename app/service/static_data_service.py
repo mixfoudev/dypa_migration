@@ -40,6 +40,7 @@ def spec_exists(dypaId, name):
     return name in [s['name'] for s in hash_specs[dypaId]]
 
 def get_class_section_id(dypaId, name, periodNum, acYearId):
+    print("get_class_section_id(dypaId, name, periodNum, acYearId)", dypaId, name, periodNum, acYearId)
     sections = [x for x in hash_sections[dypaId] if x['title'] == name and int(x['period_num']) == periodNum and int(x['academic_year_id']) == acYearId]
     if len(sections) == 0: return None
     return sections[0]

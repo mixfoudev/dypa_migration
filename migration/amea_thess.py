@@ -17,7 +17,7 @@ def section_from_row(row):
     d['acYear'] = row['ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ'].strip()
     d['spec'] = row['ΕΙΔΙΚΟΤΗΤΑ'].strip()
     d['period'] = int(row['ΕΤΟΣ'].strip())
-    period = int(row['ΕΤΟΣ']) if row['ΕΤΟΣ']=='ΝΑΙ' else int(row['ΕΤΟΣ']) + 10
+    period = int(row['ΕΤΟΣ']) if row['ΚΕΠΕ']!='ΝΑΙ' else int(row['ΕΤΟΣ']) + 10
     d['periodNum'] = period
 
     # d['grade'] = float(row['ΒΑΘΜΟΣ Μ.Ο'].strip())
