@@ -1,5 +1,4 @@
 import pandas as pd
-import re
 from app.service import static_data_service as staticService
 from validation import general_validations as v
 
