@@ -80,7 +80,6 @@ def validate_student(row):
         elif field_name == "ΠΑΡΑΚΟΛΟΥΘΕΙ ΜΑΘΗΜΑΤΑ ΓΕΝ ΠΑΙΔΕΙΑΣ":
             valid = value in ['ΝΑΙ', 'ΟΧΙ']
 
-        
         elif field_name in ["ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ", "ΑΚΑΔ. ΕΤΟΣ ΕΓΓΡΑΦΗΣ"]:
             valid = v.validate_ac_year(value) and staticService.get_ac_year(value)
 
@@ -92,6 +91,9 @@ def validate_student(row):
         sec = row['ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ'].strip()
         valid = staticService.class_section_exists(dypaId, sec, row['ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ'], period, spec)
         if not valid: err.append("ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ")
+        # edu year spec
+        valid = not v.eduSpecMissing(row, err)
+        if not valid: err.append("ΕΙΔΙΚΟΤΗΤΑ ΑΝΑ ΕΤΟΣ")
 
     if period and period == 2 :
         value = row['ΒΑΘΜΟΣ ΠΡΟΗΓ. ΤΑΞΗΣ']

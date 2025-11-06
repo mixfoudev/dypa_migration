@@ -39,9 +39,9 @@ def spec_exists(dypaId, name):
             spec_ids[s['name']] = s['id']
     return name in [s['name'] for s in hash_specs[dypaId]]
 
-def get_class_section_id(dypaId, name, periodNum, acYearId, specId):
+def get_class_section_id(dypaId, name, periodNum, acYearId, spName):
     print("get_class_section_id(dypaId, name, periodNum, acYearId)", dypaId, name, periodNum, acYearId)
-    sections = [x for x in hash_sections[dypaId] if x['code'] == name and int(x['period_num']) == periodNum and int(x['academic_year_id']) == acYearId and int(x['specId']) == specId]
+    sections = [x for x in hash_sections[dypaId] if x['code'] == name and int(x['period_num']) == periodNum and int(x['academic_year_id']) == acYearId and x['spName'] == spName]
     if len(sections) == 0: return None
     return sections[0]
 

@@ -26,6 +26,12 @@ def check_academic_years(df, dypaId):
     #print("ac yeaaaaaaaaaaars: ", out)
     return out
 
+def eduSpecMissing(row, err):
+    for s in ['ΕΙΔΙΚΟΤΗΤΑ', 'ΣΧΟΛΗ', 'ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ']: 
+        if s in err: True
+    eduSpecId = staticService.get_edu_year_spec(row['ΣΧΟΛΗ'].strip(), row['ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ'], row['ΕΙΔΙΚΟΤΗΤΑ'].strip())
+    return eduSpecId is None
+
 def is_valid_date(value):
     try:
         #splitter = "-" if "-" in value else "/"

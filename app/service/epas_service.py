@@ -29,7 +29,7 @@ def save(user, contact, personal, student, classStud):
         eduSpec = staticService.get_edu_year_spec(student.get('edu'), classStud.get('acYear'), classStud.get('spec'))
 
         inputAcYearId = staticService.get_acYear_id(classStud.get('acYear'))
-        section = staticService.get_class_section_id(dypaId, classStud.get('section'), classStud.get('periodNum'), inputAcYearId)
+        section = staticService.get_class_section_id(dypaId, classStud.get('section'), classStud.get('periodNum'), inputAcYearId, student.get('spec'))
         #section = staticService.get_class_section_id(dypaId, classStud.get('section'))
         classId = section['id']
         print("classId", classId)

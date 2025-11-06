@@ -1,5 +1,4 @@
 import pandas as pd
-import re
 from app.service import static_data_service as staticService
 from app.service import epas_service
 
@@ -122,74 +121,6 @@ def calc_period(tp):
     if tp.upper() in ["Α", "Α'", "Α ΤΆΞΗ", "Α ΤΑΞΗ"]: return 1
     if tp.upper() in ["Β", "Β'", "Β ΤΆΞΗ", "Β ΤΑΞΗ"]: return 2
     return None
-
-def is_valid_date(value):
-    try:
-        
-        #splitter = "-" if "-" in value else "/"
-        splitter = "/"
-        dayFirst = len(value.split(splitter)[-1]) == 4
-        if not dayFirst: return False
-        pd.to_datetime(value, dayfirst=dayFirst, errors='raise')
-        return True
-    except Exception as e:
-        print(e)
-        return False
-
-def validate_field(field_name, value):
-    if field_name == "ΑΜ":
-        try:
-            int(value)
-            return True
-        except Exception as e:
-            return False
-
-    if field_name == "ΑΦΜ":
-        return isinstance(value, (int, float, str)) and str(value).isdigit() and len(str(value)) == 9
-
-    if field_name == "ΑΜ":
-        return isinstance(value, (int, float, str)) and str(value).isdigit() and len(str(value)) >0
-
-    elif field_name == "EMAIL":
-        pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
-        return bool(re.match(pattern, str(value)))
-
-    elif field_name in ["ΗΜ/ΝΙΑ ΓΕΝΝΗΣΗΣ", "ΗΜΝΙΑ ΕΓΓΡΑΦΗΣ"]:
-        return is_valid_date(value)
-
-    elif field_name == "ΦΥΛΟ":
-        return str(value).strip().lower() in ["α", "θ"]
-
-    elif field_name == "ΤΚ":
-        return str(value).isdigit() and len(str(value)) == 5
-    
-    elif field_name == "ΕΙΔΙΚΟΤΗΤΑ":
-        return staticService.spec_exists(1, value)
-    
-    elif field_name in ["ΑΚΑΔ. ΕΤΟΣ", "ΑΚΑΔ. ΕΤΟΣ ΕΓΓΡΑΦΗΣ"]:
-        try:
-            start, end = value.split("/")
-            if len(start) != 4 or len(end) != 4: return False
-            if int(start) >= int(end) : return False
-            if not (int(start) +1) == int(end) : return False
-            return True
-        except Exception as e:
-            return False
-
-    elif field_name == "ΠΑΡΑΚΟΛΟΥΘΕΙ ΜΑΘΗΜΑΤΑ ΓΕΝ ΠΑΙΔΕΙΑΣ":
-        return value and value in ['ΝΑΙ', 'ΟΧΙ']
-
-    # epas specific
-    elif field_name == "ΤΑΞΗ":
-        return value and calc_period(value) in [1,2]
-    
-    elif field_name == "ΣΧΟΛΗ":
-        return value and staticService.edu_exists(1, value)
-    
-    elif field_name == "ΧΩΡΑ":
-        return value and staticService.country_exists(value)
-
-    return True
 
 def migrate_excel(file_path):
     df = pd.read_excel(file_path, dtype=str)
