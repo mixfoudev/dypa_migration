@@ -263,13 +263,13 @@ def createStudentSaekFields(dto, userId, contactId, personalId, uuid,cursor=None
     return q.insert_saek_registration(values, cursor)
 
 def createStudentAmeaFields(dto, userId, healthId, contactId, eduSpecId, eduId, personalId, uuid,cursor=None):
-    print("createStudentAmeaFields")
+    print("createStudentAmeaFields, eduSpecId, eduId", eduSpecId, eduId)
     values = []
     values.append(staticService.get_acYear_id(dto.get('acYearRegister'))) # academic_year_id
     values.append(dto.get('date_submitted'))
     values.append(5) # dypa_inst_type_id
-    values.append(eduSpecId) # edu_id
-    values.append(eduId) # edu_spec_id
+    values.append(eduId) # edu_id
+    values.append(eduSpecId) # edu_spec_id
     values.append(dto.get('eval_result'))
     values.append(dto.get('eval_status'))
     values.append(dto.get('status'))
