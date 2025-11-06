@@ -62,6 +62,19 @@ def get_class_sections(dypaId):
     if dypaId in [33,95]:
         if dypaId ==33: dypaId=3
         with db.cursor() as cursor:
+            cursor.execute(f"SELECT cs.*, ac.name as 'acName', sp.name as spName, sp.id as spId FROM class_sections cs inner join educational_unit_specialties esp on esp.id=cs.edu_specialty_id inner join student_specialties sp on sp.id = esp.student_specialty_id inner join academic_years ac on ac.id = cs.academic_year_id where cs.edu_id={dypaId}")
+            return cursor.fetchall()
+    else:
+        with db.cursor() as cursor:
+            cursor.execute(f"SELECT cs.*, ac.name as 'acName', sp.name as spName, sp.id as spId FROM class_sections cs inner join educational_unit_specialties esp on esp.id=cs.edu_specialty_id inner join student_specialties sp on sp.id = esp.student_specialty_id inner join academic_years ac on ac.id = cs.academic_year_id where cs.dypa_inst_type_id={dypaId}")
+            return cursor.fetchall()
+        
+def get_class_sections2(dypaId):
+    db = current_app.config['DB']
+    #print("DB. fetching specs for dypa: ", dypaId)
+    if dypaId in [33,95]:
+        if dypaId ==33: dypaId=3
+        with db.cursor() as cursor:
             cursor.execute(f"SELECT cs.*, ac.name as 'acName' FROM class_sections cs inner join academic_years ac on ac.id = cs.academic_year_id where cs.edu_id={dypaId}")
             return cursor.fetchall()
     else:

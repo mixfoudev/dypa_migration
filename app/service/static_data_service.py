@@ -39,9 +39,9 @@ def spec_exists(dypaId, name):
             spec_ids[s['name']] = s['id']
     return name in [s['name'] for s in hash_specs[dypaId]]
 
-def get_class_section_id(dypaId, name, periodNum, acYearId):
+def get_class_section_id(dypaId, name, periodNum, acYearId, specId):
     print("get_class_section_id(dypaId, name, periodNum, acYearId)", dypaId, name, periodNum, acYearId)
-    sections = [x for x in hash_sections[dypaId] if x['title'] == name and int(x['period_num']) == periodNum and int(x['academic_year_id']) == acYearId]
+    sections = [x for x in hash_sections[dypaId] if x['code'] == name and int(x['period_num']) == periodNum and int(x['academic_year_id']) == acYearId and int(x['specId']) == specId]
     if len(sections) == 0: return None
     return sections[0]
 
@@ -57,11 +57,12 @@ def get_class_lessonsEpas(classId):
         class_lessonsEpas[classId] = lessons
     return class_lessonsEpas[classId]
 
-def class_section_exists(dypaId, name, acName, periodNum):
+def class_section_exists(dypaId, name, acName, periodNum, spName):
+    #print("class_section_exists, dypaId, name, acName, periodNum, spName: ", dypaId, name, acName, periodNum, spName)
     if not dypaId in hash_sections.keys():
         hash_sections[dypaId] = q.get_class_sections(dypaId)
     #print("aaaaaaaaaaa:   ", hash_sections[dypaId])
-    return name in [s['title'] for s in hash_sections[dypaId] if s['acName'] == acName and int(s['period_num']) == periodNum]
+    return name in [s['code'] for s in hash_sections[dypaId] if s['acName'] == acName and int(s['period_num']) == periodNum and s['spName'] == spName]
 
 def edu_exists(dypaId, name):
     if not dypaId in hash_edu.keys():
