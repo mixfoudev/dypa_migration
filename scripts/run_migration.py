@@ -46,6 +46,7 @@ with app.app_context():
 
     sections = data['section_students']
     part_students = data['part_students'] if "part_students" in data.keys() else []
+    prev_periods = data['prev_periods'] if "prev_periods" in data.keys() else []
     #print(data)
     error_sections = []
     if sections:
@@ -53,12 +54,12 @@ with app.app_context():
         error_sections = [s for k,s in sections.items() if not s['exist']]
         sections = [s for k,s in sections.items() if s['exist']]
 
-    valid = (sections and not error_sections) or part_students
+    valid = (sections and not error_sections and not prev_periods) or part_students
     if not errors and valid:
         #✅❌
         print("✅ Everything seems OK.")
         print("Running migration")
-        if input("continue to migration ? (y/n): ") == 'y':
+        if input("continue to migration ? (y/N): ") == 'y':
              migrate.migrate_school(dypaType, file_path)
     else:
         exist_students = data['existing_students'] if 'existing_students' in data.keys() else None
@@ -72,3 +73,7 @@ with app.app_context():
             print("❌Students exist:")
             for err in exist_students:
                 print(" -", err)
+        if prev_periods:
+            print("❌ Teach Periods missing:")
+            for p in prev_periods.keys():
+                print(" -", f"{p} - {prev_periods[p]}")        

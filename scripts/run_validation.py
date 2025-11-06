@@ -42,11 +42,18 @@ with app.app_context():
         print("File does not exist: ", file_path)
         exit()
     
-    errors= validate.validate_school(dypaType, file_path)['errors']
+    data = validate.validate_school(dypaType, file_path)
+    errors = data['errors']
+    prev_periods = data['prev_periods']
 
-    if not errors:
+    if not errors and not prev_periods:
         print("✅ Everything seems OK.")
     else:
-        print("❌ Errors found:")
-        for err in errors:
-            print(" -", err)
+        if errors:
+            print("❌ Errors found:")
+            for err in errors:
+                print(" -", err)
+        if prev_periods:
+            print("❌ Teach Periods missing:")
+            for p in prev_periods.keys():
+                print(" -", f"{p} - {prev_periods[p]}")

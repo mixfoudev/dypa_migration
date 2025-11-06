@@ -110,6 +110,29 @@
             </table>
             {% endif %}
 
+            {% if data.prev_periods %}
+            <h3 style="color:red;">Διδακτικές Ενότητες που δεν υπάρχουν στο σύστημα</h3>
+            <table class="styled-table">
+                <thead>
+                    <th style="background-color: red; color: whitesmoke;">Ακαδ. Έτος</th>
+                    <th style="background-color: red; color: whitesmoke;">Διδ. Ενότητες</th>
+                </thead>
+                <tbody>
+                    {% for s in data.prev_periods.keys() %}
+                    <tr>
+                        <td>{{s}}</td>
+                        <td>{{','.join(data.prev_periods[s])}}</td>
+                        <!-- <td>{% for p in data.prev_periods[s] %}
+                            {{p}},
+                            {% endfor %}
+                        </td> -->
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+            {% endif %}
+
             {% if data.section_students or data.part_students or data.students %}
             <h2>ΔΕΔΟΜΕΝΑ</h2>
             <p>Παρατηρήστε τα δεδομένα μήπως υπάρχει και κάποιο λογικό λάθος.</p>
