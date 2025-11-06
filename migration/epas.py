@@ -29,8 +29,8 @@ def section_from_row(row):
 def contact_from_row(row):
     d ={}
     d['email'] = row['EMAIL'].strip()
-    d['mobile'] = row['ΚΙΝΗΤΟ ΤΗΛ'].strip()
-    d['phone'] = row['ΣΤΑΘΕΡΟ ΤΗΛ'].strip()
+    d['mobile'] = row['ΚΙΝΗΤΟ ΤΗΛ'].strip() if pd.notna(row['ΚΙΝΗΤΟ ΤΗΛ']) else None
+    d['phone'] = row['ΣΤΑΘΕΡΟ ΤΗΛ'].strip() if pd.notna(row['ΣΤΑΘΕΡΟ ΤΗΛ']) else None
     d['address'] = row['ΔΙΕΥΘΥΝΣΗ'].strip()
     d['addressNum'] = row['ΑΡΙΘΜΟΣ'].strip()
     d['city'] = row['ΠΟΛΗ'].strip()
@@ -91,8 +91,8 @@ def row_to_dto(row):
     d['dob'] = row['ΗΜ/ΝΙΑ ΓΕΝΝΗΣΗΣ'].strip()
     d['gender'] = row['ΦΥΛΟ'].strip()
     d['email'] = row['EMAIL'].strip()
-    d['mobile'] = row['ΚΙΝΗΤΟ ΤΗΛ'].strip()
-    d['phone'] = row['ΣΤΑΘΕΡΟ ΤΗΛ'].strip()
+    d['mobile'] = row['ΚΙΝΗΤΟ ΤΗΛ'].strip() if pd.notna(row['ΚΙΝΗΤΟ ΤΗΛ']) else None
+    d['phone'] = row['ΣΤΑΘΕΡΟ ΤΗΛ'].strip() if pd.notna(row['ΣΤΑΘΕΡΟ ΤΗΛ']) else None
     d['address'] = row['ΔΙΕΥΘΥΝΣΗ'].strip()
     d['addressNum'] = row['ΑΡΙΘΜΟΣ'].strip()
     d['city'] = row['ΠΟΛΗ'].strip()

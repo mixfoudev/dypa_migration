@@ -33,13 +33,9 @@ def validate_personal(row):
             err.append(field)
     return err
 
-def validate_student(row):
+def validate_student(row, prevErr):
     col = [
-    "ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ", "ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ", "ΤΑΞΗ", "ΕΙΔΙΚΟΤΗΤΑ", "ΑΜ",
-    "ΗΜΝΙΑ ΕΓΓΡΑΦΗΣ", "ΑΚΑΔ. ΕΤΟΣ ΕΓΓΡΑΦΗΣ", "ΣΧΟΛΗ",
-    "ΒΑΘΜΟΣ Μ.Ο", "ΑΔΙΚ.ΑΠΟΥΣΙΕΣ", "ΔΙΚΑΙΟΛ. ΑΠΟΥΣΙΕΣ",
-    #,"ΑΔΙΚ.ΑΠΟΥΣΙΕΣ","ΜΗ ΜΕΤΡ.ΑΠΟΥΣΙΕΣ", ""ΠΑΡΑΚΟΛΟΥΘΕΙ ΜΑΘΗΜΑΤΑ ΓΕΝ ΠΑΙΔΕΙΑΣ""
-    #,"ΑΡΙΘ. ΦΟΙΤΗΣΕΩΝ" # "ΒΑΘΜΟΣ ΠΡΟΗΓ. ΤΑΞΗΣ",
+    "ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ", "ΒΑΘΜΟΣ Μ.Ο", "ΑΔΙΚ.ΑΠΟΥΣΙΕΣ", "ΔΙΚΑΙΟΛ. ΑΠΟΥΣΙΕΣ"
     ]
     err = []
     period = 2
@@ -56,18 +52,8 @@ def validate_student(row):
             err.append(field_name)
             continue
         valid = True
-        if field_name == "ΕΙΔΙΚΟΤΗΤΑ":
-            valid = staticService.spec_exists(dypaId, value)
-            if valid: spec = value
-
-        elif field_name == "ΣΧΟΛΗ":
-            valid = staticService.edu_exists(dypaId, value)
-            if valid: sxoli = value
-
-        elif field_name in ["ΗΜ/ΝΙΑ ΓΕΝΝΗΣΗΣ", "ΗΜΝΙΑ ΕΓΓΡΑΦΗΣ"]:
-            valid = v.is_valid_date(value)
-
-        elif field_name == "ΒΑΘΜΟΣ Μ.Ο":
+    
+        if field_name == "ΒΑΘΜΟΣ Μ.Ο":
             valid = v.isNumber(value) and 10 >= float(value) <= 20
 
         elif field_name == "ΑΔΙΚ.ΑΠΟΥΣΙΕΣ":
@@ -76,30 +62,19 @@ def validate_student(row):
         elif field_name == "ΔΙΚΑΙΟΛ. ΑΠΟΥΣΙΕΣ":
             valid = v.isNumber(value) and 0 < int(value) <= 160
 
-        elif field_name in ["ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ", "ΑΚΑΔ. ΕΤΟΣ ΕΓΓΡΑΦΗΣ"]:
-            valid = v.validate_ac_year(value) and staticService.get_ac_year(value)
-
         if not valid: err.append(field_name)
 
 
+    allErr = err + prevErr
     sec_val = ['ΣΧΟΛΗ', 'ΕΙΔΙΚΟΤΗΤΑ', 'ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ', 'ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ']
-    if all([s not in err for s in sec_val]):
+    if all([s not in allErr for s in sec_val]):
         sec = row['ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ'].strip()
-        valid = staticService.class_section_exists(dypaId, sec, row['ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ'], period, spec)
-        if not valid: err.append("ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ")
-        # edu year spec
-        valid = not v.eduSpecMissing(row, err)
-        if not valid: err.append("ΕΙΔΙΚΟΤΗΤΑ ΑΝΑ ΕΤΟΣ")
-
-    if "ΑΜ" not in err and 'ΣΧΟΛΗ' not in err:
-        am = row['ΑΜ']
-        if not sxoli in unique_ams.keys(): unique_ams[sxoli] = []
-        if am not in unique_ams[sxoli]:
-            unique_ams[sxoli].append(am)
-        else: err.append("Διπλότυπος ΑΜ για την σχολή " + sxoli)
-        #
-        if int(am) in staticService.get_edu_ams(dypaId, sxoli):
-            err.append("Ο ΑΜ υπάρχει στο σύστημα για την σχολή " + sxoli)
+        spec = row['ΕΙΔΙΚΟΤΗΤΑ'].strip()
+        sxoli = row['ΣΧΟΛΗ'].strip()
+        valid = staticService.class_section_exists(dypaId, sec, row['ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ'], period, spec, sxoli)
+        if not valid:
+            allErr.append("ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ")
+            err.append("ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ")
     
     if len(err) == 0:
         if not sec in section_students.keys(): section_students[sec] = {"name":sec,"total": 0, "exist": False, "data": []}
@@ -135,7 +110,13 @@ def validate_excel(file_path):
             err += pers_error
             row_errors[key] += pers_error
 
-        stud_error = validate_student(row)
+        global_stud_error = v.validate_global_student(row, dypaId, unique_ams)
+        print("global_stud_error: ", global_stud_error)
+        if len(global_stud_error) > 0:
+            err += global_stud_error
+            row_errors[key] += global_stud_error
+
+        stud_error = validate_student(row, err)
         print("stud_error: ", stud_error)
         if len(stud_error) > 0:
             err += stud_error

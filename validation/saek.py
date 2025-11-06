@@ -1,6 +1,7 @@
 import pandas as pd
 import re
 from app.service import static_data_service as staticService
+from validation import general_validations as v
 
 # expected columns
 COLUMNS = [
@@ -18,6 +19,13 @@ pending_cols=["ΧΡΩΣΤΟΥΜ. ΜΑΘ. Α ΕΞΑΜ","ΧΡΩΣΤΟΥΜ. ΜΑΘ.
 
 dypaId = 3
 prev_years =[]
+unique_vats = []
+unique_adts = []
+existing_students=[]
+unique_ams = {}
+students = {"total": 0, "data": []}
+section_students = {}
+part_students = {}
 
 def calc_period(tp):
     if not tp: return None
@@ -198,7 +206,7 @@ def eduSpecMissing(row, err):
     eduSpecId = staticService.get_edu_year_spec(row['ΣΧΟΛΗ'], row['ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ'], row['ΕΙΔΙΚΟΤΗΤΑ'])
     return eduSpecId is None
 
-def validate_excel(file_path):
+def validate_excel2(file_path):
     df = pd.read_excel(file_path, dtype=str)
     data = {"errors": None,"section_students": None,"students": None}
 
@@ -315,9 +323,138 @@ def _needsPrevYear(periodNum, row):
     if periodNum in [2,4] and (pd.notna(row['ΧΡΩΣΤΟΥΜ. ΜΑΘ. Β ΕΞΑΜ']) or pd.notna(row['ΧΡΩΣΤΟΥΜ. ΜΑΘ. Δ ΕΞΑΜ'])): return True
     return False
 
-# if __name__ == "__main__":
-#     errors = validate_excel("data/epas.xlsx") 
-#     if len(errors) == 0:
-#         print("Everything seems ok.")
-#     else:
-#         for err in errors: print(err)
+def validate_prev_lesson_fields(row, err):
+    for i, field in enumerate(pending_cols):
+        # if i == 3:
+        #     if pd.notna(row['ΧΡΩΣΤΟΥΜ. ΜΑΘ. Δ ΕΞΑΜ']) and ( pd.notna(row['ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ']) or pd.notna(row['ΕΞΑΜΗΝΟ']) ):
+        #         err.append(field)
+        #         continue
+        value = row[field]
+        valid = pd.isna(value) or (v.isNumber(value, int) and staticService.lesson_exists(row['ΕΙΔΙΚΟΤΗΤΑ'], i + 1 , value))
+        if not valid: err.append(field)
+
+def check_prev_years(row, period, err):
+    if period and 'ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ' not in err:
+        needsPrev = _needsPrevYear(period, row)
+        if needsPrev:
+            acYearL = row['ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ'].split("/")
+            prevStr = f"{int(acYearL[0])-1}/{int(acYearL[1])-1}"
+            if prevStr not in prev_years: prev_years.append(prevStr)
+
+def validate_personal(row):
+    col = ["ΑΦΜ", "ΕΠΩΝΥΜΟ", "ΟΝΟΜΑ","ΕΠΩΝΥΜΟ ΠΑΤΕΡΑ", "ΟΝΟΜΑ ΠΑΤΕΡΑ", "ΗΜ/ΝΙΑ ΓΕΝΝΗΣΗΣ", "ΦΥΛΟ", "EMAIL", "ΚΙΝΗΤΟ ΤΗΛ", "ΣΤΑΘΕΡΟ ΤΗΛ",
+    "ΔΙΕΥΘΥΝΣΗ", "ΑΡΙΘΜΟΣ", "ΠΟΛΗ", "ΤΚ", "ΑΜΚΑ", "ΑΜΑ", "ΤΟΠΟΣ ΓΕΝΝΗΣΗΣ", "ΑΔΤ", "ΧΩΡΑ", 
+    #,"ΑΜ ΑΡΡΕΝΩΝ","ΑΡ. ΔΗΜΟΤΟΛΟΓ","ΔΗΜΟΣ ΕΓΓΡΑΦΗΣ","ΕΠΩΝΥΜΟ ΜΗΤΕΡΑΣ", "ΟΝΟΜΑ ΜΗΤΕΡΑΣ", "IBAN", "ΤΟΠ ΕΓΓ Μ.Α", "ΚΠΑ"
+    ]
+    return v.validate_personal(row, col, students, existing_students, unique_vats, unique_adts)
+
+def validate_student(row, prevErr):
+    col = [
+    "ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ","ΕΞΑΜΗΝΟ", 
+    "ΧΡΩΣΤΟΥΜ. ΜΑΘ. Α ΕΞΑΜ","ΧΡΩΣΤΟΥΜ. ΜΑΘ. Β ΕΞΑΜ","ΧΡΩΣΤΟΥΜ. ΜΑΘ. Γ ΕΞΑΜ","ΧΡΩΣΤΟΥΜ. ΜΑΘ. Δ ΕΞΑΜ"
+    ]
+    err = []
+    period = None
+    spec = None
+    sxoli = None
+    sec = None
+
+    onlyPart = (pd.isna(row['ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ']) and pd.isna(row['ΕΞΑΜΗΝΟ'])) and pd.notna(row['ΧΡΩΣΤΟΥΜ. ΜΑΘ. Δ ΕΞΑΜ'])
+
+    if not 'ΕΙΔΙΚΟΤΗΤΑ' in prevErr: validate_prev_lesson_fields(row, err)
+
+    if onlyPart: 
+        period = 4
+        check_prev_years(row, period, prevErr)
+    else:# not only part
+        if pd.isna(row['ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ']): err.append("ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ")
+        if pd.isna(row['ΕΞΑΜΗΝΟ']): err.append("ΕΞΑΜΗΝΟ")
+        else:
+            value = row['ΕΞΑΜΗΝΟ']
+            period = calc_period(value)
+            if period is None or period not in [1,2,3,4]: err.append("ΕΞΑΜΗΝΟ")
+
+        if pd.notna(row['ΧΡΩΣΤΟΥΜ. ΜΑΘ. Δ ΕΞΑΜ']): err.append("Δεν μπορεί να υπάρχει ΧΡΩΣΤΟΥΜ. ΜΑΘ. Δ ΕΞΑΜ σε πλήρη φοίτηση")    
+
+        if period:
+            pendValError = validate_pending_lesson(row, period)
+            if pendValError: err.append(pendValError)
+            else: check_prev_years(row, period, prevErr)
+
+        allErr = err + prevErr
+        sec_val = ['ΣΧΟΛΗ', 'ΕΞΑΜΗΝΟ', 'ΕΙΔΙΚΟΤΗΤΑ', 'ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ', 'ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ']
+        if all([s not in allErr for s in sec_val]):
+            sec = row['ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ'].strip()
+            spec = row['ΕΙΔΙΚΟΤΗΤΑ'].strip()
+            sxoli = row['ΣΧΟΛΗ'].strip()
+            valid = staticService.class_section_exists(dypaId, sec, row['ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ'], period, spec, sxoli)
+            if not valid:
+                allErr.append("ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ")
+                err.append("ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ")
+        
+       
+    if len(err) == 0:
+        if onlyPart:
+            if not 'data' in part_students.keys(): part_students['data'] = []
+            part_students['data'].append(row['ΑΦΜ'].strip())
+        else:
+            if not sec in section_students.keys(): section_students[sec] = {"name":sec,"total": 0, "exist": False, "data": []}
+            section_students[sec]['data'].append(row['ΑΦΜ'].strip())
+            section_students[sec]['exist'] = True
+    return err
+
+def validate_excel(file_path):
+    df = pd.read_excel(file_path, dtype=str)
+    data = {"errors": None,"section_students": None,"students": None}
+
+    errors = set(COLUMNS) - set(df.columns)
+    if errors:
+        r = [f"Δεν βρέθηκε η στήλη: {e}" for e in errors]
+        #return r, None, None
+        data["errors"] = r
+        return data
+    if df.shape[0] == 0:
+        data["errors"] = ["Το αρχείο δεν έχει δεδομένα"]
+        return data
+
+    errors = []
+    row_errors={}
+    
+    for i, row in df.iterrows():
+        err = []
+        key = i+2
+        if not key in row_errors: row_errors[key] = []
+
+        pers_error = validate_personal(row)
+        print("pers_error: ", pers_error)
+        if len(pers_error) > 0:
+            err += pers_error
+            row_errors[key] += pers_error
+
+        global_stud_error = v.validate_global_student(row, dypaId, unique_ams)
+        print("global_stud_error: ", global_stud_error)
+        if len(global_stud_error) > 0:
+            err += global_stud_error
+            row_errors[key] += global_stud_error
+
+        stud_error = validate_student(row, err)
+        print("stud_error: ", stud_error)
+        if len(stud_error) > 0:
+            err += stud_error
+            row_errors[key] += stud_error
+
+    students["total"] = len(students["data"])
+    for k in section_students:
+        section_students[k]['total'] = len(section_students[k]['data'])
+
+
+    for rk in row_errors.keys():
+        if len(row_errors[rk]) == 0 : continue
+        errors.append(f"Σειρά: {rk} - Μη έγκυρες τιμές: {', '.join(row_errors[rk])}")
+    
+    students['data'] = sorted(students["data"], key=lambda x: x['lastname'])
+    data = {"errors": errors,"section_students": section_students,"students": students if len(students['data']) > 0 else None, "part_students": part_students}
+    acYears = v.check_academic_years(df, dypaId)
+    data['ac_years'] = sorted(acYears, key=lambda x: x['name'])
+    data['existing_students'] = existing_students
+    return data
