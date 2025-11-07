@@ -44,9 +44,10 @@ with app.app_context():
     
     data = validate.validate_school(dypaType, file_path)
     errors = data['errors']
-    prev_periods = data['prev_periods']
+    prev_periods = data['prev_periods'] if 'prev_periods' in data.keys() else []
+    existing_students = data['existing_students'] if 'existing_students' in data.keys() else []
 
-    if not errors and not prev_periods:
+    if not errors and not prev_periods and not existing_students:
         print("✅ Everything seems OK.")
     else:
         if errors:
@@ -57,3 +58,7 @@ with app.app_context():
             print("❌ Teach Periods missing:")
             for p in prev_periods.keys():
                 print(" -", f"{p} - {prev_periods[p]}")
+        if existing_students:
+            print("❌ Existing students found:")
+            for s in existing_students:
+                print(" - vat: ", f"{s}")

@@ -109,6 +109,7 @@ def validate_personal(row, col, students, existing_students, unique_vats, unique
 
         if not valid: err.append(field_name)
 
+
     if "ΑΦΜ" not in err:
         vat = row['ΑΦΜ']
         if vat not in unique_vats:

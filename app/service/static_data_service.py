@@ -16,7 +16,7 @@ class_lessonsEpas = {}
 
 def student_exists_by_vat(vat):
     c = len(q.active_student_exists_by_vat(vat))
-    #print("active students: ", c)
+    #print("aaaaaaaaaaa active students: ", c)
     return c > 0
 
 def get_edu_year_spec(edu, acName, specName):
