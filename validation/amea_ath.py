@@ -54,7 +54,7 @@ def validate_student(row, prevErr):
         valid = True
     
         if field_name == "ΒΑΘΜΟΣ Μ.Ο":
-            valid = v.isNumber(value) and 10 >= float(value) <= 20
+            valid = v.isNumber(value) and 10 <= float(value) <= 20
 
         elif field_name == "ΑΔΙΚ.ΑΠΟΥΣΙΕΣ":
             valid = v.isNumber(value) and 0 < int(value) <= 70
