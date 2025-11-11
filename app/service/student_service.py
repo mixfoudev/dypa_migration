@@ -290,6 +290,8 @@ def createStudentAmeaFields(dto, userId, healthId, contactId, eduSpecId, eduId, 
 def createPendingLessons(dto, studId, eduId, specId, periodNum, cursor=None):
     lesIds = []
     perNums = []
+    #periods = ["Α' ΕΞΑΜΗΝΟ","Β' ΕΞΑΜΗΝΟ","Γ' ΕΞΑΜΗΝΟ","Δ' ΕΞΑΜΗΝΟ"]
+    periods = ["Α' Εξάμηνο","Β' Εξάμηνο","Γ' Εξάμηνο","Δ' Εξάμηνο"]
     for i in range(1,5):
         k = 'pendLes'+str(i)
         if dto[k]:
@@ -324,7 +326,7 @@ def createPendingLessons(dto, studId, eduId, specId, periodNum, cursor=None):
         #print('perNums[i]:', perNums[i],)
         #periods = [p for p in year['periods'] if int(p['dypa_inst_type_id']) == 3]
         #print('saek periods:', periods,)
-        period = [p for p in year['periods'] if int(p['dypa_inst_type_id']) == 3 and int(p['num']) == perNums[i]][0]
+        #period = [p for p in year['periods'] if int(p['dypa_inst_type_id']) == 3 and int(p['num']) == perNums[i]][0]
         #print(f"save acYearId= {year['id']}")
         #print(f"save period= {period}")
         values = []
@@ -337,8 +339,9 @@ def createPendingLessons(dto, studId, eduId, specId, periodNum, cursor=None):
         values.append(studId) # student_id
         values.append(None) # transfer_app_id
         values.append(None) # class_stud_lesson_id
-        values.append(year['id']) # academic_year_id
-        values.append(period['id']) # teach_period_id
+        values.append(acYearId) # academic_year_id
+        #values.append(period['id']) # teach_period_id
+        values.append(periods[perNums[i] -1]) # teach_period_id
         q.insert_pending_lesson(values,cursor)
     #raise Error("eeee")
 
@@ -346,3 +349,4 @@ def _needsPrevYear(periodNum, dto):
     if periodNum in [1,3] and (dto['pendLes1']or dto['pendLes3']): return True
     if periodNum in [2,4] and (dto['pendLes2']or dto['pendLes4']): return True
     return False
+

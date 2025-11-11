@@ -22,7 +22,7 @@ def section_from_row(row):
     d['spec'] = row['ΕΙΔΙΚΟΤΗΤΑ'].strip()
     d['period'] = row['ΤΑΞΗ'].strip()
     d['periodNum'] = int(calc_period(d['period']))
-    d['grade'] = float(row['ΒΑΘΜΟΣ ΠΡΟΗΓ. ΤΑΞΗΣ'].strip())
+    d['grade'] = float(row['ΒΑΘΜΟΣ ΠΡΟΗΓ. ΤΑΞΗΣ'].strip()) if d['periodNum'] else None
     d['studyNum'] = row['ΑΡΙΘ. ΦΟΙΤΗΣΕΩΝ'].strip()
     return d
 
@@ -112,7 +112,7 @@ def row_to_dto(row):
     d['dateRegister'] = row['ΗΜΝΙΑ ΕΓΓΡΑΦΗΣ'].strip()
     d['acYearRegister'] = row['ΑΚΑΔ. ΕΤΟΣ ΕΓΓΡΑΦΗΣ'].strip()
     d['edu'] = row['ΣΧΟΛΗ'].strip()
-    d['grade'] = row['ΒΑΘΜΟΣ ΠΡΟΗΓ. ΤΑΞΗΣ'].strip()
+    d['grade'] = row['ΒΑΘΜΟΣ ΠΡΟΗΓ. ΤΑΞΗΣ'].strip() if d['periodNum'] else None
     d['studyNum'] = row['ΑΡΙΘ. ΦΟΙΤΗΣΕΩΝ'].strip()
     return d
 

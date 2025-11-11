@@ -312,8 +312,12 @@ def insert_amea_registration(values, cursor=None):
     
 
 def insert_pending_lesson(values, cursor=None):
+    # sql = """INSERT INTO `student_transfer_pending_lessons` (`created_at`, `updated_at`, `edu_id`, `is_pending`, `lesson_id`, `period_num`, `spec_id`,
+    #   `student_group_id`, `student_id`, `trasfer_app_id`, `class_student_lesson_id`, `academic_year_id`, `teach_period_id`, `period_text`)
+    #     VALUES (now(), now(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    #     """
     sql = """INSERT INTO `student_transfer_pending_lessons` (`created_at`, `updated_at`, `edu_id`, `is_pending`, `lesson_id`, `period_num`, `spec_id`,
-      `student_group_id`, `student_id`, `trasfer_app_id`, `class_student_lesson_id`, `academic_year_id`, `teach_period_id`)
+      `student_group_id`, `student_id`, `trasfer_app_id`, `class_student_lesson_id`, `academic_year_id`, `period_text`)
         VALUES (now(), now(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
     print("Creating pending lesson with values: ",values)
