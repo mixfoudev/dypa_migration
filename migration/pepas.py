@@ -113,6 +113,7 @@ def row_to_dto(row):
     d['dateRegister'] = row['ΗΜΝΙΑ ΕΓΓΡΑΦΗΣ'].strip()
     d['acYearRegister'] = row['ΑΚΑΔ. ΕΤΟΣ ΕΓΓΡΑΦΗΣ'].strip()
     d['edu'] = row['ΣΧΟΛΗ'].strip()
+    d['periodNum'] = int(calc_period(d['period']))
     d['grade'] = row['ΒΑΘΜΟΣ ΠΡΟΗΓ. ΤΑΞΗΣ'].strip() if d['periodNum'] else None
     d['studyNum'] = row['ΑΡΙΘ. ΦΟΙΤΗΣΕΩΝ'].strip()
     return d
