@@ -16,10 +16,11 @@ def section_from_row(row):
     d['section'] = row['ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ'].strip()
     d['acYear'] = row['ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ'].strip()
     d['spec'] = row['ΕΙΔΙΚΟΤΗΤΑ'].strip()
-    #d['period'] = int(row['ΕΤΟΣ'].strip())
-    d['grade'] = float(row['ΒΑΘΜΟΣ Μ.Ο'].strip())
-    d['abs'] = int(row['ΑΔΙΚ.ΑΠΟΥΣΙΕΣ'].strip())
-    d['justAbs'] = int(row['ΔΙΚΑΙΟΛ. ΑΠΟΥΣΙΕΣ'].strip())
+    d['period'] = int(row['ΕΤΟΣ'].strip())
+    d['period_num'] = int(row['ΕΤΟΣ'].strip())
+    d['grade'] = float(row['ΒΑΘΜΟΣ Μ.Ο'].strip()) if d['period'] == 2 else None
+    d['abs'] = int(row['ΑΔΙΚ.ΑΠΟΥΣΙΕΣ'].strip()) if d['period'] == 2 else None
+    d['justAbs'] = int(row['ΔΙΚΑΙΟΛ. ΑΠΟΥΣΙΕΣ'].strip()) if d['period'] == 2 else None
     return d
 
 def contact_from_row(row):
@@ -100,9 +101,9 @@ def row_to_dto(row):
     d['dateRegister'] = row['ΗΜΝΙΑ ΕΓΓΡΑΦΗΣ'].strip()
     d['acYearRegister'] = row['ΑΚΑΔ. ΕΤΟΣ ΕΓΓΡΑΦΗΣ'].strip()
     d['edu'] = row['ΣΧΟΛΗ'].strip()
-    d['grade'] = row['ΒΑΘΜΟΣ Μ.Ο'].strip()
-    d['abs'] = int(row['ΑΔΙΚ.ΑΠΟΥΣΙΕΣ'].strip())
-    d['justAbs'] = int(row['ΔΙΚΑΙΟΛ. ΑΠΟΥΣΙΕΣ'].strip())
+    # d['grade'] = row['ΒΑΘΜΟΣ Μ.Ο'].strip()
+    # d['abs'] = int(row['ΑΔΙΚ.ΑΠΟΥΣΙΕΣ'].strip())
+    # d['justAbs'] = int(row['ΔΙΚΑΙΟΛ. ΑΠΟΥΣΙΕΣ'].strip())
     d['kepa'] = row['ΠΑΘΗΣΗ ΚΕΠΑ'].strip()
     return d
 

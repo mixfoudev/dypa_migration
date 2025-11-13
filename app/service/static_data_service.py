@@ -58,7 +58,7 @@ def get_class_lessonsEpas(classId):
     return class_lessonsEpas[classId]
 
 def class_section_exists(dypaId, name, acName, periodNum, spName, eduName):
-    #print("class_section_exists, dypaId, name, acName, periodNum, spName: ", dypaId, name, acName, periodNum, spName)
+    print("class_section_exists, dypaId, name, acName, periodNum, spName: ", dypaId, name, acName, periodNum, spName)
     if not dypaId in hash_sections.keys():
         hash_sections[dypaId] = q.get_class_sections(dypaId)
     #print("aaaaaaaaaaa:   ", hash_sections[dypaId])

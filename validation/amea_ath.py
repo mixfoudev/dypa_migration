@@ -4,7 +4,7 @@ from validation import general_validations as v
 
 # expected columns
 COLUMNS = [
-    "ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ", "ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ",  "ΠΑΘΗΣΗ ΚΕΠΑ", "ΕΙΔΙΚΟΤΗΤΑ",  "ΑΦΜ", "ΕΠΩΝΥΜΟ", "ΟΝΟΜΑ",
+    "ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ", "ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ",  "ΠΑΘΗΣΗ ΚΕΠΑ", "ΕΙΔΙΚΟΤΗΤΑ",  "ΑΦΜ", "ΕΠΩΝΥΜΟ", "ΟΝΟΜΑ",'ΕΤΟΣ',
     "ΕΠΩΝΥΜΟ ΠΑΤΕΡΑ", "ΟΝΟΜΑ ΠΑΤΕΡΑ", "ΕΠΩΝΥΜΟ ΜΗΤΕΡΑΣ", "ΟΝΟΜΑ ΜΗΤΕΡΑΣ", "ΥΠΗΚΟΟΤΗΤΑ",
     "ΗΜ/ΝΙΑ ΓΕΝΝΗΣΗΣ", "ΦΥΛΟ", "EMAIL", "ΚΙΝΗΤΟ ΤΗΛ", "ΣΤΑΘΕΡΟ ΤΗΛ",
     "ΔΙΕΥΘΥΝΣΗ", "ΑΡΙΘΜΟΣ", "ΠΟΛΗ", "ΤΚ", "ΑΜΚΑ", "ΑΜΑ","ΑΔΤ","IBAN", "ΑΜ ΑΡΡΕΝΩΝ",
@@ -35,10 +35,10 @@ def validate_personal(row):
 
 def validate_student(row, prevErr):
     col = [
-    "ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ", "ΒΑΘΜΟΣ Μ.Ο", "ΑΔΙΚ.ΑΠΟΥΣΙΕΣ", "ΔΙΚΑΙΟΛ. ΑΠΟΥΣΙΕΣ"
+    "ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ", "ΒΑΘΜΟΣ Μ.Ο", "ΑΔΙΚ.ΑΠΟΥΣΙΕΣ", "ΔΙΚΑΙΟΛ. ΑΠΟΥΣΙΕΣ", 'ΕΤΟΣ'
     ]
     err = []
-    period = 2
+    period = None
     spec = None
     sxoli = None
     sec = None
@@ -52,6 +52,11 @@ def validate_student(row, prevErr):
             err.append(field_name)
             continue
         valid = True
+
+        if field_name == "ΕΤΟΣ":
+            valid = v.isNumber(value) and int(value) in [1,2]
+            if valid: period = int(value)
+            period = int(value)
     
         if field_name == "ΒΑΘΜΟΣ Μ.Ο":
             valid = v.isNumber(value) and 10 <= float(value) <= 20
@@ -66,7 +71,7 @@ def validate_student(row, prevErr):
 
 
     allErr = err + prevErr
-    sec_val = ['ΣΧΟΛΗ', 'ΕΙΔΙΚΟΤΗΤΑ', 'ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ', 'ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ']
+    sec_val = ['ΣΧΟΛΗ', 'ΕΤΟΣ', 'ΕΙΔΙΚΟΤΗΤΑ', 'ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ', 'ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ']
     if all([s not in allErr for s in sec_val]):
         sec = row['ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ'].strip()
         spec = row['ΕΙΔΙΚΟΤΗΤΑ'].strip()
