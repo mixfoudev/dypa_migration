@@ -1,4 +1,5 @@
 from flask import Flask, request, render_template, redirect, url_for, flash
+from flask_session import Session
 import os
 import pymysql
 from werkzeug.utils import secure_filename
@@ -9,6 +10,11 @@ app = Flask(__name__)
 app.secret_key = "supersecretkey"
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10MB limit
+
+app.config['SESSION_TYPE'] = 'filesystem'
+app.config['SESSION_FILE_DIR'] = '/tmp/flask_session'   # default
+Session(app)
+
  # Database connection
 app.config['DB'] = pymysql.connect(
     host=os.getenv('DB_HOST'),
@@ -21,17 +27,6 @@ app.config['DB'] = pymysql.connect(
 
 
 ALLOWED_EXTENSIONS = {'xlsx'}
-
-
-REQUIRED_COLUMNS = [
-    "ΤΜΗΜΑ", "ΑΚΑΔ. ΕΤΟΣ", "ΕΙΔΙΚΟΤΗΤΑ", "ΤΑΞΗ", "ΑΦΜ", "ΕΠΩΝΥΜΟ", "ΟΝΟΜΑ",
-    "ΕΠΩΝΥΜΟ ΠΑΤΕΡΑ", "ΟΝΟΜΑ ΠΑΤΕΡΑ", "ΕΠΩΝΥΜΟ ΜΗΤΕΡΑΣ", "ΟΝΟΜΑ ΜΗΤΕΡΑΣ",
-    "ΗΜ/ΝΙΑ ΓΕΝΝΗΣΗΣ", "ΦΥΛΟ", "EMAIL", "ΚΙΝΗΤΟ ΤΗΛ", "ΣΤΑΘΕΡΟ ΤΗΛ",
-    "ΔΙΕΥΘΥΝΣΗ", "ΑΡΙΘΜΟΣ", "ΠΟΛΗ", "ΤΚ", "ΑΜΚΑ", "ΑΜΑ", "ΤΟΠΟΣ ΓΕΝΝΗΣΗΣ",
-    "ΔΗΜΟΣ ΕΓΓΡΑΦΗΣ", "ΑΡ. ΔΗΜΟΤΟΛΟΓ", "ΧΩΡΑ", "IBAN", "ΑΜ ΑΡΡΕΝΩΝ",
-    "ΤΟΠ ΕΓΓ Μ.Α", "ΚΠΑ", "ΠΑΡΑΚΟΛΟΥΘΕΙ ΜΑΘΗΜΑΤΑ ΓΕΝ ΠΑΙΔΕΙΑΣ", "ΑΜ",
-    "ΗΜΝΙΑ ΕΓΓΡΑΦΗΣ", "ΑΚΑΔ. ΕΤΟΣ ΕΓΓΡΑΦΗΣ", "ΣΧΟΛΗ"
-]
 
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
@@ -82,48 +77,6 @@ def upload_file():
     #data = []
     return render_template("upload.html", data=data)
 
-
-
-""" @app.route("/", methods=["GET", "POST"])
-def upload_file():
-    if request.method == "POST":
-        if "file" not in request.files:
-            flash("No file part")
-            return redirect(request.url)
-        
-        file = request.files["file"]
-        school = request.form.get("school")
-        print(school)
-        if file.filename == "":
-            flash("Δεν επιλέχθηκε αρχείο")
-            return redirect(request.url)
-
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(filepath)
-
-            
-            # missing_columns = set(REQUIRED_COLUMNS) - set(df.columns)
-            # if missing_columns:
-            #     return render_template("upload.html", missing_columns=missing_columns)
-            
-            try:
-                error_rows = validate.validate_school(school, filepath)
-                print("erors: ",len(error_rows))
-            except Exception as e:
-                flash(f"Αδυναμία ανάγνωσης αρχείου: {e}")
-                return redirect(request.url)
-            #finally: os.remove(filepath)
-
-
-            return render_template("upload.html", errors=error_rows, success=len(error_rows) ==0)
-
-        else:
-            flash("Μη έγκυρο αρχείο.")
-            return redirect(request.url)
-
-    return render_template("upload.html", errors=None) """
 
 if __name__ == "__main__":
     #app.run(debug=True)
