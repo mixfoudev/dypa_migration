@@ -140,22 +140,27 @@
 
             {% if data.section_students %}            
             <h3>Τμήματα: {{data.section_students|length}}</h3>
+            <table class="styled-table">
+                    <thead>
+                        <th>ΤΜΗΜΑ</th>
+                        <th style="text-align: end;">ΠΛΗΘΟΣ ΜΑΘΗΤΩΝ</th>
+                    </thead>
+                </table>
             <div style="max-height: 400px; overflow-y: auto;">
                 <table class="styled-table">
-                <thead>
-                    <th>ΤΜΗΜΑ</th>
-                    <th style="text-align: end;">ΠΛΗΘΟΣ ΜΑΘΗΤΩΝ</th>
-                </thead>
-                <tbody>
-                    {% for sec, stud in data.section_students.items() %}
-                    <tr>
-                        <td>{%if stud.exist%}✅{%else%}❌{%endif%}{{sec}}</td>
-                        <td style="text-align: end;">{{stud.total}}</td>
-                    </tr>
-                    {% endfor %}
-
-                </tbody>
-            </table>
+                    <<!-- thead>
+                        <th>ΤΜΗΜΑ</th>
+                        <th style="text-align: end;">ΠΛΗΘΟΣ ΜΑΘΗΤΩΝ</th>
+                    </thead> -->
+                    <tbody>
+                        {% for sec, stud in data.section_students.items() %}
+                        <tr>
+                            <td>{%if stud.exist%}✅{%else%}❌{%endif%}{{sec}}</td>
+                            <td style="text-align: end;">{{stud.total}}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
             
             {% endif %}
