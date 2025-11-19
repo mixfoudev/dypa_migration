@@ -166,7 +166,8 @@
 
             {% if data.students %}
             <h3>Μαθητές: {{data.students.data|length}}</h3>
-            <table class="styled-table">
+            <div style="max-height: 400px; overflow-y: auto;">
+                <table class="styled-table">
                 <thead>
                     <th>ΑΦΜ</th>
                     <th>ΕΠΩΝΥΜΟ</th>
@@ -183,12 +184,15 @@
 
                 </tbody>
             </table>
+            </div>
+            
             {% endif %}
 
             {% if data.ac_years %}
             <!-- <h3>Ακαδημαϊκά έτη προς δημιουργία ή τροποποίηση: {{data.ac_years|length}}</h3> -->
             <h3>Ακαδημαϊκά έτη: {{data.ac_years|length}}</h3>
-            <table class="styled-table">
+            <div style="max-height: 400px; overflow-y: auto;">
+                <table class="styled-table">
                 <thead>
                     <th>ΑΚΑΔΗΜΑΙΚΟ ΕΤΟΣ</th>
                     <th style="text-align: end;">ΥΠΑΡΧΟΥΣΕΣ ΠΕΡΙΟΔΟΙ ΓΙΑ ΤΗ ΔΟΜΗ</th>
@@ -203,6 +207,7 @@
 
                 </tbody>
             </table>
+            </div>
             {% endif %}
         </div>
     </main>
