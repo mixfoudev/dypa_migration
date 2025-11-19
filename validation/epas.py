@@ -123,19 +123,19 @@ def validate_excel(file_path):
         if not key in row_errors: row_errors[key] = []
 
         pers_error = validate_personal(row)
-        print("pers_error: ", pers_error)
+        #print("pers_error: ", pers_error)
         if len(pers_error) > 0:
             err += pers_error
             row_errors[key] += pers_error
 
         global_stud_error = v.validate_global_student(row, dypaId, unique_ams)
-        print("global_stud_error: ", global_stud_error)
+        #print("global_stud_error: ", global_stud_error)
         if len(global_stud_error) > 0:
             err += global_stud_error
             row_errors[key] += global_stud_error
 
         stud_error = validate_student(row, err)
-        print("stud_error: ", stud_error)
+        #print("stud_error: ", stud_error)
         if len(stud_error) > 0:
             err += stud_error
             row_errors[key] += stud_error

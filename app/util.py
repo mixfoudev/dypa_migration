@@ -3,7 +3,14 @@ import pandas as pd
 from functools import partial
 
 def date_parser_function(col):
-    return pd.to_datetime(col, dayfirst=True)
+    try:
+        return pd.to_datetime(col, dayfirst=True)
+    except:
+        try:
+            return pd.to_datetime(col, dayfirst=False)
+        except:
+            return None    
+    
 
 def load_excel(file_path):
     date_columns = ["ΗΜ/ΝΙΑ ΓΕΝΝΗΣΗΣ", "ΗΜΝΙΑ ΕΓΓΡΑΦΗΣ"]
