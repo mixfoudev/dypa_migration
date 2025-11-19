@@ -148,7 +148,7 @@
                 </table>
             <div style="max-height: 400px; overflow-y: auto;">
                 <table class="styled-table">
-                    <<!-- thead>
+                    <!-- thead>
                         <th>ΤΜΗΜΑ</th>
                         <th style="text-align: end;">ΠΛΗΘΟΣ ΜΑΘΗΤΩΝ</th>
                     </thead> -->
@@ -171,13 +171,20 @@
 
             {% if data.students %}
             <h3>Μαθητές: {{data.students.data|length}}</h3>
-            <div style="max-height: 400px; overflow-y: auto;">
-                <table class="styled-table">
+            <table class="styled-table">
                 <thead>
                     <th>ΑΦΜ</th>
                     <th>ΕΠΩΝΥΜΟ</th>
                     <th>ΟΝΟΜΑ</th>
                 </thead>
+            </table>
+            <div style="max-height: 400px; overflow-y: auto;">
+                <table class="styled-table">
+                <!-- <thead>
+                    <th>ΑΦΜ</th>
+                    <th>ΕΠΩΝΥΜΟ</th>
+                    <th>ΟΝΟΜΑ</th>
+                </thead> -->
                 <tbody>
                     {% for s in data.students.data %}
                     <tr>
@@ -186,7 +193,6 @@
                         <td>{{s.name}}</td>
                     </tr>
                     {% endfor %}
-
                 </tbody>
             </table>
             </div>
