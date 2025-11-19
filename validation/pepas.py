@@ -93,6 +93,13 @@ def validate_student(row, prevErr):
     return err
 
 def validate_excel(file_path):
+    global unique_adts, unique_ams, unique_vats, existing_students, students, section_students
+    unique_vats = []
+    unique_adts = []
+    existing_students=[]
+    unique_ams = {}
+    students = {"total": 0, "data": []}
+    section_students = {}
     # df = pd.read_excel(file_path, dtype=str)
     df = u.load_excel(file_path)
     data = {"errors": None,"section_students": None,"students": None}
