@@ -1,6 +1,7 @@
 import pandas as pd
 from app.service import static_data_service as staticService
 from app.service import epas_service
+from app import util as u
 
 # expected columns
 COLUMNS = [
@@ -124,7 +125,8 @@ def calc_period(tp):
     return None
 
 def migrate_excel(file_path):
-    df = pd.read_excel(file_path, dtype=str)
+    # df = pd.read_excel(file_path, dtype=str)
+    df = u.load_excel(file_path)
     dtos = []
     for i, row in df.iterrows():
         dto = row_to_dto(row)

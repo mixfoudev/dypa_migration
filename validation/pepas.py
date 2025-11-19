@@ -1,6 +1,7 @@
 import pandas as pd
 from app.service import static_data_service as staticService
 from validation import general_validations as v
+from app import util as u
 
 # expected columns
 COLUMNS = [
@@ -92,7 +93,8 @@ def validate_student(row, prevErr):
     return err
 
 def validate_excel(file_path):
-    df = pd.read_excel(file_path, dtype=str)
+    # df = pd.read_excel(file_path, dtype=str)
+    df = u.load_excel(file_path)
     data = {"errors": None,"section_students": None,"students": None}
 
     errors = set(COLUMNS) - set(df.columns)
@@ -125,54 +127,6 @@ def validate_excel(file_path):
             row_errors[key] += global_stud_error
 
         stud_error = validate_student(row, err)
-        print("stud_error: ", stud_error)
-        if len(stud_error) > 0:
-            err += stud_error
-            row_errors[key] += stud_error
-
-    students["total"] = len(students["data"])
-    for k in section_students:
-        section_students[k]['total'] = len(section_students[k]['data'])
-
-
-    for rk in row_errors.keys():
-        if len(row_errors[rk]) == 0 : continue
-        errors.append(f"Σειρά: {rk} - Μη έγκυρες τιμές: {', '.join(row_errors[rk])}")
-    
-    students['data'] = sorted(students["data"], key=lambda x: x['lastname'])
-    data = {"errors": errors,"section_students": section_students,"students": students if len(students['data']) > 0 else None}
-    acYears = v.check_academic_years(df, dypaId)
-    data['ac_years'] = sorted(acYears, key=lambda x: x['name'])
-    data['existing_students'] = existing_students
-    return data
-    df = pd.read_excel(file_path, dtype=str)
-    data = {"errors": None,"section_students": None,"students": None}
-
-    errors = set(COLUMNS) - set(df.columns)
-    if errors:
-        r = [f"Δεν βρέθηκε η στήλη: {e}" for e in errors]
-        #return r, None, None
-        data["errors"] = r
-        return data
-    if df.shape[0] == 0:
-        data["errors"] = ["Το αρχείο δεν έχει δεδομένα"]
-        return data
-
-    errors = []
-    row_errors={}
-    
-    for i, row in df.iterrows():
-        err = []
-        key = i+2
-        if not key in row_errors: row_errors[key] = []
-
-        pers_error = validate_personal(row)
-        print("pers_error: ", pers_error)
-        if len(pers_error) > 0:
-            err += pers_error
-            row_errors[key] += pers_error
-
-        stud_error = validate_student(row)
         print("stud_error: ", stud_error)
         if len(stud_error) > 0:
             err += stud_error

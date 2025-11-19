@@ -1,7 +1,7 @@
 import pandas as pd
 import re
 from app.service import static_data_service as staticService
-
+from app import util as u
 
 def check_academic_years(df, dypaId):
     ac = df['ΑΚΑΔ. ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ'].unique().tolist()
@@ -34,16 +34,18 @@ def eduSpecMissing(row, err):
     return eduSpecId is None
 
 def is_valid_date(value):
-    try:
-        #splitter = "-" if "-" in value else "/"
-        splitter = "/"
-        dayFirst = len(value.split(splitter)[-1]) == 4
-        if not dayFirst: return False
-        pd.to_datetime(value, dayfirst=dayFirst, errors='raise')
-        return True
-    except Exception as e:
-        print(e)
-        return False
+    date = u.get_date(value)
+    return date is not None
+    # try:
+    #     #splitter = "-" if "-" in value else "/"
+    #     splitter = "/"
+    #     dayFirst = len(value.split(splitter)[-1]) == 4
+    #     if not dayFirst: return False
+    #     pd.to_datetime(value, dayfirst=dayFirst, errors='raise')
+    #     return True
+    # except Exception as e:
+    #     print(e)
+    #     return False
 
 def validate_ac_year(value):
     try:
@@ -97,6 +99,9 @@ def validate_personal(row, col, students, existing_students, unique_vats, unique
 
         elif field_name in ["ΗΜ/ΝΙΑ ΓΕΝΝΗΣΗΣ", "ΗΜΝΙΑ ΕΓΓΡΑΦΗΣ"]:
             valid = is_valid_date(value)
+            # if not valid:
+            #     print("value is not valid", value)
+            #     exit()
 
         elif field_name == "ΦΥΛΟ":
             valid = str(value).strip().lower() in ["α", "θ"]

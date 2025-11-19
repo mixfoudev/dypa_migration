@@ -2,6 +2,7 @@ import pandas as pd
 import re
 from app.service import static_data_service as staticService
 from app.service import saek_service
+from app import util as u
 
 # expected columns
 COLUMNS = [
@@ -200,7 +201,8 @@ def validate_field(field_name, value):
     return True
 
 def migrate_excel(file_path):
-    df = pd.read_excel(file_path, dtype=str)
+    # df = pd.read_excel(file_path, dtype=str)
+    df = u.load_excel(file_path)
     
     dtos = []
     for i, row in df.iterrows():

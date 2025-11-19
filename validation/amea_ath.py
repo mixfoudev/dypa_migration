@@ -1,6 +1,7 @@
 import pandas as pd
 from app.service import static_data_service as staticService
 from validation import general_validations as v
+from app import util as u
 
 # expected columns
 COLUMNS = [
@@ -35,9 +36,8 @@ def validate_personal(row):
     return err
 
 def validate_student(row, prevErr):
-    col = [
-    "ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ", "ΒΑΘΜΟΣ Μ.Ο", "ΑΔΙΚ.ΑΠΟΥΣΙΕΣ", "ΔΙΚΑΙΟΛ. ΑΠΟΥΣΙΕΣ", 'ΕΤΟΣ'
-    ]
+    # col = ["ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ", "ΒΑΘΜΟΣ Μ.Ο", "ΑΔΙΚ.ΑΠΟΥΣΙΕΣ", "ΔΙΚΑΙΟΛ. ΑΠΟΥΣΙΕΣ", 'ΕΤΟΣ']
+    col = ["ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ",'ΕΤΟΣ']
     err = []
     period = None
     spec = None
@@ -58,17 +58,28 @@ def validate_student(row, prevErr):
             valid = v.isNumber(value) and int(value) in [1,2]
             if valid: period = int(value)
             period = int(value)
-    
-        if field_name == "ΒΑΘΜΟΣ Μ.Ο":
-            valid = v.isNumber(value) and 10 <= float(value) <= 20
+            if not valid: err.append(field_name)
 
-        elif field_name == "ΑΔΙΚ.ΑΠΟΥΣΙΕΣ":
-            valid = v.isNumber(value) and 0 < int(value) <= 70
-    
-        elif field_name == "ΔΙΚΑΙΟΛ. ΑΠΟΥΣΙΕΣ":
-            valid = v.isNumber(value) and 0 < int(value) <= 160
 
-        if not valid: err.append(field_name)
+    col = ["ΒΑΘΜΟΣ Μ.Ο", "ΑΔΙΚ.ΑΠΟΥΣΙΕΣ", "ΔΙΚΑΙΟΛ. ΑΠΟΥΣΙΕΣ"]
+
+    for field_name in col:
+        if field_name not in row: continue
+        value = row[field_name]
+        if type(value) == str: value = value.strip()
+        #print(f"p val field: {field_name} | value: {value} | isna: {pd.isna(value)}")
+        valid = True
+        if period == 2:
+            if field_name == "ΒΑΘΜΟΣ Μ.Ο":
+                valid = v.isNumber(value) and 10 <= float(value) <= 20
+
+            elif field_name == "ΑΔΙΚ.ΑΠΟΥΣΙΕΣ":
+                valid = v.isNumber(value) and 0 < int(value) <= 70
+        
+            elif field_name == "ΔΙΚΑΙΟΛ. ΑΠΟΥΣΙΕΣ":
+                valid = v.isNumber(value) and 0 < int(value) <= 160
+
+            if not valid: err.append(field_name)
 
 
     allErr = err + prevErr
@@ -89,7 +100,8 @@ def validate_student(row, prevErr):
     return err
 
 def validate_excel(file_path):
-    df = pd.read_excel(file_path, dtype=str)
+    # df = pd.read_excel(file_path, dtype=str)
+    df = u.load_excel(file_path)
     data = {"errors": None,"section_students": None,"students": None}
 
     errors = set(COLUMNS) - set(df.columns)
@@ -111,19 +123,19 @@ def validate_excel(file_path):
         if not key in row_errors: row_errors[key] = []
 
         pers_error = validate_personal(row)
-        print("pers_error: ", pers_error)
+        #print("pers_error: ", pers_error)
         if len(pers_error) > 0:
             err += pers_error
             row_errors[key] += pers_error
 
         global_stud_error = v.validate_global_student(row, dypaId, unique_ams)
-        print("global_stud_error: ", global_stud_error)
+        #print("global_stud_error: ", global_stud_error)
         if len(global_stud_error) > 0:
             err += global_stud_error
             row_errors[key] += global_stud_error
 
         stud_error = validate_student(row, err)
-        print("stud_error: ", stud_error)
+        #print("stud_error: ", stud_error)
         if len(stud_error) > 0:
             err += stud_error
             row_errors[key] += stud_error

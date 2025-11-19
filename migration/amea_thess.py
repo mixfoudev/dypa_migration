@@ -1,5 +1,6 @@
 import pandas as pd
 from app.service import amea_thes_service
+from app import util as u
 
 # expected columns
 COLUMNS = [
@@ -113,7 +114,8 @@ def row_to_dto(row):
     return d
 
 def migrate_excel(file_path):
-    df = pd.read_excel(file_path, dtype=str)
+    # df = pd.read_excel(file_path, dtype=str)
+    df = u.load_excel(file_path)
     dtos = []
     for i, row in df.iterrows():
         dto = row_to_dto(row)

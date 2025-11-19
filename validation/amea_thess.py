@@ -1,6 +1,7 @@
 import pandas as pd
 from app.service import static_data_service as staticService
 from validation import general_validations as v
+from app import util as u
 
 # expected columns
 COLUMNS = [
@@ -86,7 +87,8 @@ def validate_student(row, prevErr):
     return err
 
 def validate_excel(file_path):
-    df = pd.read_excel(file_path, dtype=str)
+    # df = pd.read_excel(file_path, dtype=str)
+    df = u.load_excel(file_path)
     data = {"errors": None,"section_students": None,"students": None}
 
     errors = set(COLUMNS) - set(df.columns)

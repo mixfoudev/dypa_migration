@@ -1,4 +1,13 @@
 from datetime import datetime
+import pandas as pd
+from functools import partial
+
+def date_parser_function(col):
+    return pd.to_datetime(col, dayfirst=True)
+
+def load_excel(file_path):
+    date_columns = ["ΗΜ/ΝΙΑ ΓΕΝΝΗΣΗΣ", "ΗΜΝΙΑ ΕΓΓΡΑΦΗΣ"]
+    return pd.read_excel(file_path, dtype=str,parse_dates=date_columns, date_parser=date_parser_function)
 
 def get_gender(value):
     if not value: return None
@@ -7,6 +16,27 @@ def get_gender(value):
     else: return 'OTHER'
 
 def get_date(date_string):
+    formats = ['%Y-%m-%d','%Y/%m/%d','%m-%Y-%d','%m/%Y/%d','%d-%m-%Y','%d/%m/%Y','%m-%d-%Y','%m/%d/%Y']
+    valid = None
+    for f in formats:
+        if valid: break
+        try:
+            o = datetime.strptime(date_string, f)
+            valid = o
+            #print("valid: ", o)
+        except ValueError as e:
+            #print(e)
+            try:
+                o = datetime.strptime(date_string, f+' %H:%M:%S')
+                valid = o
+                #print("valid: ", o)
+            except ValueError as e:
+                #print(e)
+                pass
+    #print(f"date_string:{date_string} - valid date:{valid}")
+    return valid
+
+def get_date2(date_string):
     """
     Ensures a date string is in 'YYYY-MM-DD' format.
     
@@ -31,6 +61,14 @@ def get_date(date_string):
         return date_string  # It's already in the desired format
     except ValueError:
         pass # Not in YYYY-MM-DD, proceed to check other formats
+
+    # Attempt to parse as MM/DD/YYYY
+    try:
+        date_object = datetime.strptime(date_string, "%m/%d/%Y")
+        # If successful, convert it to YYYY-MM-DD
+        return date_object.strftime("%Y-%m-%d")
+    except ValueError:
+        pass # Not in DD/MM/YYYY
 
     # Attempt to parse as DD/MM/YYYY
     try:
