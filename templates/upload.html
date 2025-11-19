@@ -140,7 +140,8 @@
 
             {% if data.section_students %}            
             <h3>Τμήματα: {{data.section_students|length}}</h3>
-            <table class="styled-table">
+            <div style="max-height: 400px; overflow-y: auto;">
+                <table class="styled-table">
                 <thead>
                     <th>ΤΜΗΜΑ</th>
                     <th style="text-align: end;">ΠΛΗΘΟΣ ΜΑΘΗΤΩΝ</th>
@@ -155,6 +156,8 @@
 
                 </tbody>
             </table>
+            </div>
+            
             {% endif %}
 
             {% if data.part_students %}
