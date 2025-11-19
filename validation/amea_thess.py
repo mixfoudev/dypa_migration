@@ -19,6 +19,7 @@ existing_students=[]
 unique_ams = {}
 students = {"total": 0, "data": []}
 section_students = {}
+kepas = ["ΚΩΦΩΣΗ", "ΛΟΙΠΕΣ ΟΡΓΑΝΙΚΕΣ ΠΑΘΗΣΕΙΣ","ΨΥΧΙΚΕΣ ΠΑΘΗΣΕΙΣ", "ΚΙΝΗΤΙΚΗ ΑΝΑΠΗΡΙΑ 50%+", "ΤΥΦΛΟΤΗΤΑ", "ΝΟΗΤΙΚΗ ΥΣΤΕΡΗΣΗ", "ΣΥΝΔΡΟΜΑ", "ΑΥΤΙΣΜΟΣ", "ΜΑΘΗΣΙΑΚΕΣ ΔΥΣΚΟΛΙΕΣ"]
 
 def validate_personal(row):
     col = ["ΑΦΜ", "ΕΠΩΝΥΜΟ", "ΟΝΟΜΑ", "ΟΝΟΜΑ ΠΑΤΕΡΑ", "ΗΜ/ΝΙΑ ΓΕΝΝΗΣΗΣ", "ΦΥΛΟ", "EMAIL", "ΚΙΝΗΤΟ ΤΗΛ", "ΣΤΑΘΕΡΟ ΤΗΛ",
@@ -28,7 +29,7 @@ def validate_personal(row):
     err = v.validate_personal(row, col, students, existing_students, unique_vats, unique_adts)
     field = 'ΠΑΘΗΣΗ ΚΕΠΑ'
     if field not in err:
-        if str(row[field]).strip().upper() not in ["ΚΩΦΩΣΗ", "ΛΟΙΠΕΣ ΟΡΓΑΝΙΚΕΣ ΠΑΘΗΣΕΙΣ","ΨΥΧΙΚΕΣ ΠΑΘΗΣΕΙΣ", "ΚΙΝΗΤΙΚΗ ΑΝΑΠΗΡΙΑ 50%+"]:
+        if str(row[field]).strip().upper() not in kepas:
             err.append(field)
     return err
 
