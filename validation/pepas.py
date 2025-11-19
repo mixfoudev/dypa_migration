@@ -85,9 +85,9 @@ def validate_student(row, prevErr):
             allErr.append("ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ")
             err.append("ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ")
     
-    if len(allErr) == 0:
+    if sec and len(err) == 0:
         if not sec in section_students.keys(): section_students[sec] = {"name":sec,"total": 0, "exist": False, "data": []}
-        section_students[sec]['data'].append(row['ΑΦΜ'])
+        if not row['ΑΦΜ'] in section_students[sec]['data']: section_students[sec]['data'].append(row['ΑΦΜ'])
         section_students[sec]['exist'] = True
     return err
 

@@ -192,13 +192,15 @@ def validate_student(row, prevErr):
                 err.append("ΤΜΗΜΑ ΕΙΣΑΓΩΓΗΣ")
        
     if len(err) == 0:
+        vat = row['ΑΦΜ'].strip()
         if onlyPart:
             if not 'data' in part_students.keys(): part_students['data'] = []
-            part_students['data'].append(row['ΑΦΜ'].strip())
+            if not vat in part_students['data']: part_students['data'].append(vat)
         else:
-            if not sec in section_students.keys(): section_students[sec] = {"name":sec,"total": 0, "exist": False, "data": []}
-            section_students[sec]['data'].append(row['ΑΦΜ'].strip())
-            section_students[sec]['exist'] = True
+            if sec:
+                if not sec in section_students.keys(): section_students[sec] = {"name":sec,"total": 0, "exist": False, "data": []}
+                if not vat in section_students[sec]['data']: section_students[sec]['data'].append(vat)
+                section_students[sec]['exist'] = True
     return err
 
 def validate_excel(file_path):
