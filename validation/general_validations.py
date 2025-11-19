@@ -70,6 +70,7 @@ def validate_personal(row, col, students, existing_students, unique_vats, unique
     for field_name in col:
         if field_name not in row: continue
         value = row[field_name]
+        if isinstance(value,str): value = value.strip()
         valid = True
         #print(f"p val field: {field_name} | value: {value} | isna: {pd.isna(value)}")
         if field_name in ['ΚΙΝΗΤΟ ΤΗΛ', 'ΣΤΑΘΕΡΟ ΤΗΛ']:
